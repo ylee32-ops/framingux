@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vulnerable Resident — Observer Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4EFE6;
+    --card: #FDFAF5;
+    --ink: #1C1710;
+    --ink-muted: #6B5D4A;
+    --ink-faint: #A8967E;
+    --accent: #C0391A;
+    --accent-soft: #F5E0D8;
+    --border: #D8CEBC;
+    --border-strong: #B5A48E;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  /* Header */
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.12;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .intro {
+    font-size: 15px;
+    color: var(--ink-muted);
+    line-height: 1.65;
+    max-width: 480px;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1.5px solid var(--border-strong);
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 36px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+  }
+
+  /* Fields */
+  .field {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 10px;
+  }
+
+  .field::placeholder { color: var(--ink-faint); }
+
+  textarea.field {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Checkbox grid */
+  .check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .check-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    accent-color: var(--accent);
+  }
+
+  .check-sub {
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* Radio row */
+  .radio-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .radio-item input[type="radio"] {
+    accent-color: var(--accent);
+  }
+
+  /* Divider */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* Submit */
+  button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 3px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.2s;
+  }
+
+  button[type="submit"]:hover {
+    background: var(--accent);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    line-height: 1.9;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 28px; }
+    .check-grid { grid-template-columns: 1fr; }
+    .radio-row { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Community Safety Network — Observer Report</div>
+  <h1>Flag a vulnerable resident</h1>
+  <p class="intro">If you regularly pass this address and notice signs of vulnerability, submit a report. No follow-up is required from you. The resident will not be contacted or disturbed.</p>
+
+  <form>
+
+    <!-- Location -->
+    <div class="section">
+      <div class="section-label">Location</div>
+      <div class="row">
+        <input class="field" type="text" placeholder="Street address">
+        <input class="field" type="text" placeholder="Unit / floor (optional)">
+      </div>
+      <div class="row">
+        <input class="field" type="text" placeholder="District / area">
+        <input class="field" type="text" placeholder="Postal code">
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Observations -->
+    <div class="section">
+      <div class="section-label">What did you observe? (select all that apply)</div>
+      <div class="check-grid">
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Hearing difficulty
+            <div class="check-sub">Didn't respond to voice</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Vision impairment
+            <div class="check-sub">Using cane, difficulty navigating</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Cognitive signs
+            <div class="check-sub">Confusion, disorientation</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Mobility limitation
+            <div class="check-sub">Wheelchair, walker, bedridden</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Medical equipment
+            <div class="check-sub">Oxygen tanks, CPAP</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Social isolation
+            <div class="check-sub">Mail piling up, no visitors</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Home deterioration
+            <div class="check-sub">Disrepair, uncollected deliveries</div>
+          </div>
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          <div>
+            Other concern
+            <div class="check-sub">Describe in notes below</div>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Urgency -->
+    <div class="section">
+      <div class="section-label">How urgent does this feel?</div>
+      <div class="radio-row">
+        <label class="radio-item">
+          <input type="radio" name="urgency" checked>
+          Routine note
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="urgency">
+          Worth monitoring
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="urgency">
+          Priority flag
+        </label>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Notes -->
+    <div class="section">
+      <div class="section-label">Additional notes (optional)</div>
+      <textarea class="field" placeholder="Estimated age, specific conditions, anything that might help rescue teams."></textarea>
+    </div>
+
+    <!-- Observer role -->
+    <div class="section">
+      <div class="section-label">Your role</div>
+      <select class="field" style="margin-bottom:0; cursor:pointer;">
+        <option value="">Select your role</option>
+        <option>Mail carrier / postman</option>
+        <option>Delivery driver</option>
+        <option>Meals-on-Wheels volunteer</option>
+        <option>Utility / meter reader</option>
+        <option>Social worker</option>
+        <option>Neighbor</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <hr>
+
+    <button type="submit">Submit report</button>
+
+  </form>
+
+  <div class="footer">
+    This report is confidential and used solely for disaster preparedness.<br>
+    The resident will not be contacted. No personal data is shared externally.
+  </div>
+
+</div>
+</body>
+</html>
