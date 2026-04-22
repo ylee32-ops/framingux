@@ -1,3 +1,5 @@
+const https = require('https');
+
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -8,27 +10,37 @@ exports.handler = async function(event) {
     return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) };
   }
 
-  try {
-    const body = JSON.parse(event.body);
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+  const body = event.body;
+
+  return new Promise((resolve) => {
+    const req = https.request({
+      hostname: 'api.openai.com',
+      path: '/v1/audio/speech',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(body)
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Length': Buffer.byteLength(body)
+      }
+    }, (res) => {
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        resolve({
+          statusCode: 200,
+          headers: { 'Content-Type': 'audio/mpeg' },
+          body: buffer.toString('base64'),
+          isBase64Encoded: true
+        });
+      });
     });
 
-    const buffer = await response.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString('base64');
+    req.on('error', (e) => {
+      resolve({ statusCode: 500, body: JSON.stringify({ error: e.message }) });
+    });
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'audio/mpeg' },
-      body: base64,
-      isBase64Encoded: true
-    };
-  } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
-  }
+    req.write(body);
+    req.end();
+  });
 };
