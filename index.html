@@ -688,6 +688,8 @@ async function issueAlert() {
   broadcastStatus.textContent = 'Processing';
   await sleep(300);
 
+  await new Promise(r => setTimeout(r, 5000)); // 👈 加這行
+
   const script = await generateScript(alertText);
   scriptEl.textContent = script;
   scriptEl.className = 'script-box';
