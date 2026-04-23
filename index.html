@@ -729,20 +729,34 @@ async function generateScript(alertText) {
   const persona = personas[currentPersonaIdx];
 
   const systemPrompt = `You are a specialist in geriatric dementia care and emergency communication.
-Translate the official disaster warning into a calming 3-sentence broadcast script for a specific vulnerable elderly person.
+Translate the official disaster warning into a calming broadcast script for a specific vulnerable elderly person.
 
-Rules:
-1. You MUST write the entire script in the elder's primary language: ${persona.language}. Do not use any other language.
-2. Address the elder by their first name in the first sentence.
-3. Explain the situation in extremely simple terms with no numbers or jargon (e.g. "it is raining very hard outside").
-4. Give ONE physical instruction based on their mobility status and the nature of the disaster:
-   - If bedridden or wheelchair-bound AND the disaster allows staying in place (e.g. typhoon, earthquake): tell them to stay exactly where they are and wait — do not attempt to move.
-   - If bedridden or wheelchair-bound AND the disaster requires leaving (e.g. fire, chemical spill, rising floodwater): tell them that a named caregiver is coming right now to carry or move them — make it sound like being looked after, not an emergency.
-   - If they can walk: give one simple, specific movement instruction using a familiar destination (e.g. "walk slowly to your neighbor Mrs. Chen's house") — never use the word "evacuate".
-5. Promise that a specific, familiar person (e.g. the village chief, a nurse, a named volunteer) is coming to help right now.
-6. Tone must be warm, gentle, and deeply reassuring throughout.
-7. Never use words like "danger", "death", "casualty", "fire", "toxic", or any frightening language — describe the situation only in the gentlest possible terms.
-8. Special note: ${persona.note}
+STEP 1 — MOBILITY + DISASTER TYPE determines the core instruction:
+- Bedridden or wheelchair-bound AND disaster allows staying in place (earthquake, typhoon, high-floor flood): tell them to stay exactly where they are. Mention that ${persona.helpers.weakTie} is nearby and coming soon.
+- Bedridden or wheelchair-bound AND disaster requires leaving (fire, chemical spill, rising floodwater, tsunami): tell them a named caregiver is coming right now to carry or move them — frame it as being looked after, not an emergency. Mention ${persona.helpers.strongTie} is also on the way.
+- Can walk BUT has dementia or Alzheimer's: do NOT give a destination. Give one single physical action they can do right now where they stand (e.g. "please hold my hand"). Imply a caregiver is physically present.
+- Can walk with no cognitive impairment AND disaster requires leaving: give one simple movement instruction toward a familiar nearby place — never use the word "evacuate". Mention ${persona.helpers.weakTie} will meet them there.
+- Can walk with no cognitive impairment AND disaster allows staying: tell them to stay inside. Mention ${persona.helpers.strongTie} has been notified and is coming.
+
+STEP 2 — COGNITION determines sentence structure and length:
+- Severe dementia or Alzheimer's: each sentence must be completely independent and immediately actionable. Assume the elder will not remember the previous sentence. Use 2-4 very short sentences.
+- Mild cognitive impairment or early dementia: sentences can have light logical flow but must remain extremely simple. Use 3 sentences maximum.
+- No cognitive impairment: sentences can connect naturally. Use exactly 3 sentences.
+
+STEP 3 — LANGUAGE determines output language:
+- You MUST write the entire script in: ${persona.language}
+- Do not use any other language, not even a single word.
+
+STEP 4 — HELPERS, always name someone specific:
+- If immediate physical help is needed: name ${persona.helpers.weakTie} as arriving first (they are closer), and mention ${persona.helpers.strongTie} has also been notified.
+- If the situation allows waiting: name ${persona.helpers.strongTie} as the person coming, and mention ${persona.helpers.weakTie} is also nearby.
+- Never use vague language like "someone will come" — always use a real name from the profile.
+
+TONE RULES:
+- Warm, gentle, and deeply reassuring at all times.
+- Never use words like "danger", "death", "fire", "toxic", "evacuate", "emergency", or any frightening language.
+- Describe all situations using only positive or neutral framing.
+- Special note: ${persona.note}
 
 Elder profile:
 - Name: ${persona.name}
@@ -752,6 +766,8 @@ Elder profile:
 - Primary language: ${persona.language}
 - Home: ${persona.location}
 - Known disaster risks for this location: ${persona.risk}
+- Strong tie (family / close contact): ${persona.helpers.strongTie}
+- Weak tie (neighbour / nearby helper): ${persona.helpers.weakTie}
 
 Output only the broadcast script itself — no preamble, no explanation.`;
 
@@ -808,7 +824,7 @@ async function generateAudio(text) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ audio: base64 })
-    }).catch(() => {}); // Pi offline = no problem
+    }).catch(() => {});
 
   } catch (e) {
     speakText(text);
