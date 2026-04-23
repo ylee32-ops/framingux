@@ -630,7 +630,9 @@ function updatePersona() {
       <strong>Location:</strong> ${p.location}<br>
       <strong>At risk from:</strong> ${p.risk}<br>
       <strong>Mobility:</strong> ${p.mobility}<br>
-      <strong>Note:</strong> ${p.note}
+      <strong>Note:</strong> ${p.note}<br><br>
+      <strong>Strong tie:</strong> ${p.helpers ? p.helpers.strongTie : '—'}<br>
+      <strong>Weak tie:</strong> ${p.helpers ? p.helpers.weakTie : '—'}
     </div>
   `;
   document.getElementById('personaMatch').textContent = p.name;
