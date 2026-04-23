@@ -688,8 +688,6 @@ async function issueAlert() {
   broadcastStatus.textContent = 'Processing';
   await sleep(300);
 
-  await new Promise(r => setTimeout(r, 5000)); // 👈 加這行
-
   const script = await generateScript(alertText);
   scriptEl.textContent = script;
   scriptEl.className = 'script-box';
@@ -777,6 +775,16 @@ Output only the broadcast script itself — no preamble, no explanation.`;
   }
 }
 
+function blobToBase64(blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(blob);
+  });
+}
+
+const PI_URL = 'http://localhost:5001'; // change to Pi IP when ready
+
 async function generateAudio(text) {
   try {
     const response = await fetch('/.netlify/functions/tts', {
@@ -786,11 +794,22 @@ async function generateAudio(text) {
     });
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
+
+    // Browser playback
     const player = document.getElementById('audioPlayer');
     const wrapper = document.getElementById('audioWrapper');
     player.src = url;
     wrapper.style.display = 'block';
     player.play().catch(() => {});
+
+    // Pi broadcast
+    const base64 = await blobToBase64(blob);
+    await fetch(`${PI_URL}/play`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio: base64 })
+    }).catch(() => {}); // Pi offline = no problem
+
   } catch (e) {
     speakText(text);
   }
