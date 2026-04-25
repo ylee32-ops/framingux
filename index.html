@@ -1082,13 +1082,14 @@ function setPipelineStep(stepNum) {
   for (let i = 1; i <= 5; i++) {
     const step = document.getElementById(`step${i}`);
     const line = document.getElementById(`line${i}`);
+    if (!step) continue;
     step.className = 'pipe-step';
     if (line) line.className = 'pipe-line';
     if (i < stepNum) { step.classList.add('done'); if (line) line.classList.add('done'); }
     else if (i === stepNum) { step.classList.add('active'); }
   }
 }
-
+ 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function issueAlert() {
