@@ -14,7 +14,73 @@
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
+
+  .app-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 56px);
+  }
+
+  .sidebar {
+    width: 48px;
+    background: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    gap: 4px;
+    flex-shrink: 0;
+    border-right: 1px solid #333;
+  }
+
+  .sidebar-tab {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #666;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .sidebar-tab:hover { background: #2a2a2a; color: #aaa; }
+  .sidebar-tab.active { background: #cc0000; color: #fff; }
+
+  .sidebar-tab .tab-tooltip {
+    position: absolute;
+    left: 52px;
+    background: #111;
+    color: #fff;
+    font-size: 10px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    border-radius: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sidebar-tab:hover .tab-tooltip { opacity: 1; }
+
+  .page-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .page { display: none; width: 100%; height: 100%; overflow: hidden; flex-direction: column; }
+  .page.active { display: flex; }
 
   .header {
     border-bottom: 2px solid #111;
@@ -22,6 +88,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: #111;
+    color: #fff;
   }
 
   .header-left { display: flex; align-items: center; gap: 12px; }
@@ -29,7 +97,7 @@
   .status-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: #111;
+    background: #fff;
     animation: blink-dot 2s infinite;
   }
 
@@ -41,9 +109,9 @@
   .status-dot.alert { background: #cc0000; animation: blink-alert 0.5s infinite; }
   @keyframes blink-alert { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-  .header h1 { font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-  .header-time { font-size: 12px; text-align: right; color: #555; }
-  .header-time .time-value { font-size: 14px; color: #111; display: block; font-weight: 600; }
+  .header h1 { font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  .header-time { font-size: 12px; text-align: right; color: #aaa; }
+  .header-time .time-value { font-size: 14px; color: #fff; display: block; font-weight: 600; }
 
   .pipeline {
     border-bottom: 1px solid #ddd;
@@ -95,26 +163,32 @@
   .alert-banner.show { transform: translateY(0); }
 
   .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
+  }
+  .col {
+    flex: 1;
+    min-width: 150px;
+    overflow: auto;
   }
 
-  .col { border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+  .col { border-right: 1px solid #ddd; display: flex; flex-direction: column; overflow: hidden; }
   .col:last-child { border-right: none; }
 
   .col-header {
     padding: 14px 24px;
     border-bottom: 1px solid #ddd;
     font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #555;
+    color: #111;
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .col-header.red { color: #cc0000; border-bottom-color: #cc0000; }
+  .col-header.red { color: #cc0000; border-bottom-color: #cc0000; background: #fff5f5; }
   .col-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 
   select {
@@ -173,7 +247,7 @@
   .alert-btn:active { background: #880000; }
   .alert-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-  .persona-card { border: 1px solid #ddd; padding: 16px; }
+  .persona-card { padding: 16px; }
   .persona-name { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 2px; }
   .persona-sub { font-size: 11px; color: #888; margin-bottom: 12px; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
@@ -331,82 +405,85 @@
   </div>
 </header>
 
-<div class="pipeline" id="pipeline">
-  <div class="pipe-step" id="step1"><div class="pipe-dot"></div><div class="pipe-label">Alert Received</div></div>
-  <div class="pipe-line" id="line1"></div>
-  <div class="pipe-step" id="step2"><div class="pipe-dot"></div><div class="pipe-label">Profile Match</div></div>
-  <div class="pipe-line" id="line2"></div>
-  <div class="pipe-step" id="step3"><div class="pipe-dot"></div><div class="pipe-label">AI Translation</div></div>
-  <div class="pipe-line" id="line3"></div>
-  <div class="pipe-step" id="step4"><div class="pipe-dot"></div><div class="pipe-label">Voice Synthesis</div></div>
-  <div class="pipe-line" id="line4"></div>
-  <div class="pipe-step" id="step5"><div class="pipe-dot"></div><div class="pipe-label">Broadcast Push</div></div>
-</div>
+<div class="app-layout">
 
+<nav class="sidebar">
+  <div class="sidebar-tab active" onclick="switchTab('alert')" id="tab-alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span class="tab-tooltip">Alert Console</span>
+  </div>
+  <div class="sidebar-tab" onclick="switchTab('registry')" id="tab-registry">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span class="tab-tooltip">Residents Registry</span>
+  </div>
+</nav>
+
+<div class="page-content">
+
+<div class="page active" id="page-alert">
 <div class="main-grid">
 
-  <div class="col">
-    <div class="col-header red">Official Alert System</div>
-    <div class="col-body">
-      <span class="box-label">// Paste or type any official warning text</span>
-      <textarea id="alertInput" rows="8" style="width:100%;border:1px solid #bbb;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.8;color:#444;resize:vertical;border-left:3px solid #cc0000;background:#fff;outline:none;margin-bottom:16px;" placeholder="Paste any official disaster warning text here..."></textarea>
-      <button class="alert-btn" id="alertBtn" onclick="issueAlert()">Issue Alert</button>
-    </div>
-  </div>
-
-  <div class="col">
-    <div class="col-header">Vulnerable Elderly Registry</div>
-    <div class="col-body">
-      <select id="personaSelect" onchange="updatePersona()">
-        <option value="0">Grandma Lin — Age 85 / Moderate Dementia (Taiwanese Hokkien)</option>
-        <option value="1">Grandpa Lee — Age 78 / Blind &amp; Bedridden (Mandarin)</option>
-        <option value="2">Grandma Chen — Age 90 / Severe Memory Loss (Taiwanese)</option>
-        <option value="3">Grandpa Wang — Age 72 / Early Alzheimer's (Hakka)</option>
-        <option value="4">Grandma Wu — Age 81 / Mild Cognitive Impairment (Mandarin)</option>
-        <option value="5">Grandma Nguyen — Age 76 / Hearing Loss (Vietnamese)</option>
-        <option value="6">Grandpa Siti — Age 80 / Dementia &amp; Mobility Issues (Indonesian)</option>
-        <option value="7">Grandma Tanaka — Age 83 / Severe Anxiety &amp; Frailty (Japanese)</option>
-        <option value="8">Grandpa Kim — Age 74 / Stroke &amp; Aphasia (Korean)</option>
-        <option value="9">Grandma Santos — Age 79 / Vision Impairment (Filipino)</option>
-        <option value="10">Grandpa Somchai — Age 77 / Parkinson's Disease (Thai)</option>
-        <option value="11">Grandma Fatimah — Age 82 / Dementia &amp; Deaf (Malay)</option>
-        <option value="12">Grandpa Hassan — Age 75 / PTSD &amp; Wheelchair (Arabic)</option>
-        <option value="13">Grandma Priya — Age 84 / Alzheimer's (Tamil)</option>
-        <option value="14">Grandpa Zhang — Age 88 / Bedridden &amp; Mute (Cantonese)</option>
-        <option value="15">Grandma Dewi — Age 71 / Blind &amp; Socially Isolated (Javanese)</option>
-        <option value="16">Grandpa Bautista — Age 73 / Wheelchair &amp; Depression (Tagalog)</option>
-        <option value="17">Grandma Yuki — Age 86 / Dementia &amp; Wandering Risk (Japanese)</option>
-        <option value="18">Grandpa Chandra — Age 69 / Early Dementia (Hindi)</option>
-        <option value="19">Grandma Park — Age 91 / Bedridden &amp; Hearing Loss (Korean)</option>
-        <option value="20">Grandpa Ah-Tsai — Age 87 / Severe Dementia (Southern Min)</option>
+  <div class="col" style="flex:2;display:flex;flex-direction:column;min-width:400px;">
+    <div class="col-header">Residents Registry</div>
+    <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+      <div style="width:220px;flex-shrink:0;border-right:1px solid #ddd;display:flex;flex-direction:column;">
+        <div style="padding:12px 16px;border-bottom:1px solid #ddd;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:11px;">
+            <input type="checkbox" id="selectAll" checked onchange="toggleSelectAll(this)" style="cursor:pointer;accent-color:#cc0000;">
+            <span>Select all (<span id="selectedCount">21</span>)</span>
+          </label>
+        </div>
+        <div id="residentList" style="overflow-y:auto;max-height:calc(15 * 57px);"></div>
+      </div>
+      <div style="flex:1;overflow-y:auto;">
+        <div class="col-body" style="padding-top:16px;">
+      <select id="personaSelect" onchange="updatePersona()" style="display:none;">
+        <option value="0">Carmen — Age 78 / Spanish (Bronx)</option>
+        <option value="1">Wei — Age 82 / Cantonese (Manhattan)</option>
+        <option value="2">Irina — Age 75 / Russian (Brooklyn)</option>
+        <option value="3">Paige — Age 91 / English (Staten Island)</option>
+        <option value="4">Rosa — Age 84 / Spanish (Manhattan)</option>
+        <option value="5">James — Age 79 / English (Brooklyn)</option>
+        <option value="6">Lily — Age 86 / Mandarin Traditional (Queens)</option>
+        <option value="7">Yusuf — Age 73 / Bengali (Queens)</option>
+        <option value="8">Grace — Age 88 / Haitian Creole (Brooklyn)</option>
+        <option value="9">Sun-Hee — Age 77 / Korean (Queens)</option>
+        <option value="10">Antonio — Age 80 / Spanish (Bronx)</option>
+        <option value="11">Natasha — Age 83 / Russian (Brooklyn)</option>
+        <option value="12">Dorothy — Age 92 / English (Manhattan)</option>
+        <option value="13">Pham — Age 76 / Vietnamese (Brooklyn)</option>
+        <option value="14">Maria — Age 85 / Spanish (Queens)</option>
+        <option value="15">Enzo — Age 81 / Italian (Brooklyn)</option>
+        <option value="16">Aisha — Age 74 / French (Manhattan)</option>
+        <option value="17">Hyun — Age 89 / Korean (Queens)</option>
+        <option value="18">Mei — Age 80 / Mandarin Simplified (Queens)</option>
+        <option value="19">Ruth — Age 87 / English (Staten Island)</option>
       </select>
       <div class="persona-card" id="personaCard"></div>
-
-      <div style="border-top:2px solid #111;padding-top:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Add New Profile</span>
-          <button onclick="toggleForm()" id="formToggleBtn" style="font-size:10px;color:#cc0000;background:none;border:none;font-family:'IBM Plex Mono',monospace;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">+ Open</button>
-        </div>
-        <div id="socialWorkerForm" style="display:none;flex-direction:column;gap:10px;">
-          <input id="sw_name" placeholder="Full name *" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_chineseName" placeholder="Chinese / local name" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_age" placeholder="Age *" type="number" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_language" placeholder="Primary language * (e.g. Vietnamese)" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_disability" placeholder="Disability / condition * (e.g. Moderate Dementia)" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_mobility" placeholder="Mobility status * (e.g. Wheelchair user)" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_location" placeholder="Home location (e.g. Coastal house, Pingtung)" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <input id="sw_risk" placeholder="Disaster risks (e.g. Typhoon · Flood)" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;"/>
-          <textarea id="sw_warning" placeholder="Responder warning — what fails with a standard alert?" rows="3" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;resize:vertical;"></textarea>
-          <textarea id="sw_note" placeholder="Special note (e.g. Panics at loud noises)" rows="2" style="border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;resize:vertical;"></textarea>
-          <button onclick="addNewPersona()" style="background:#111;color:#fff;border:none;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;width:100%;">Save Profile</button>
-          <div id="sw_feedback" style="font-size:11px;color:#cc0000;display:none;">Please fill in all required fields (marked *).</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="col">
-    <div class="col-header">AI Generated Output</div>
+    <div class="col-header red">Official Alert</div>
+    <div class="col-body">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onclick="loadLiveAlert()" id="loadAlertBtn" style="background:none;border:1px solid #cc0000;color:#cc0000;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">↓ Load Recent NYC Alert</button>
+          <span id="loadAlertStatus" style="font-size:10px;color:#888;"></span>
+        </div>
+        <select id="alertSelect" onchange="selectAlert(this)" style="display:none;border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;color:#111;">
+          <option value="">— Select an alert —</option>
+        </select>
+      </div>
+      <textarea id="alertInput" rows="8" style="width:100%;border:1px solid #bbb;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.8;color:#444;resize:vertical;border-left:3px solid #cc0000;background:#fff;outline:none;margin-bottom:16px;" placeholder="Paste any official disaster warning text here..."></textarea>
+      <button class="alert-btn" id="alertBtn" onclick="issueAlert()">Issue Alert</button>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="col-header">Audio Output</div>
     <div class="col-body">
       <div>
         <span class="box-label">// AI Translated Broadcast Script</span>
@@ -457,31 +534,269 @@
   <div id="historyList"><span class="history-empty">No alerts issued yet. History persists across page refreshes.</span></div>
 </div>
 
+</div><!-- end main-grid -->
+</div><!-- end page-alert -->
+
+<div class="page" id="page-registry">
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <!-- Registry Header -->
+    <div style="padding:14px 24px;border-bottom:1px solid #ddd;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#111;">Residents Registry</span>
+      <button onclick="openModal()" style="background:#cc0000;color:#fff;border:none;padding:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">+ Add Resident</button>
+    </div>
+    <!-- Registry Table -->
+    <div style="flex:1;overflow:auto;">
+      <div id="registryTable"></div>
+    </div>
+  </div>
+</div><!-- end page-registry -->
+
+<!-- Modal -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;width:600px;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #111;">
+      <span id="modalTitle" style="font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Add Resident</span>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#555;">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <input id="m_name" placeholder="Full name *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <input id="m_chineseName" placeholder="Chinese / local name" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <input id="m_age" type="number" placeholder="Age *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+        <input id="m_language" placeholder="Primary language *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      </div>
+      <select id="m_cognition" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+        <option value="">Cognition level * (CDR)</option>
+        <option value="No cognitive impairment (CDR 0)">No cognitive impairment (CDR 0)</option>
+        <option value="Mild cognitive impairment (CDR 0.5–1)">Mild cognitive impairment (CDR 0.5–1)</option>
+        <option value="Moderate dementia (CDR 2)">Moderate dementia (CDR 2)</option>
+        <option value="Severe dementia (CDR 3)">Severe dementia (CDR 3)</option>
+      </select>
+      <select id="m_mobility" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+        <option value="">Mobility status * (EMS)</option>
+        <option value="Fully bedridden — cannot move at all (EMS 0–4)">Fully bedridden (EMS 0–4)</option>
+        <option value="Needs full assistance — wheelchair / supported (EMS 5–9)">Needs full assistance — wheelchair / supported (EMS 5–9)</option>
+        <option value="Needs partial assistance — can walk with supervision (EMS 10–13)">Needs partial assistance — can walk with supervision (EMS 10–13)</option>
+        <option value="Independent — can walk and move alone (EMS 14+)">Independent — can walk and move alone (EMS 14+)</option>
+      </select>
+      <select id="m_sensory" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+        <option value="">Sensory impairment * (WHO)</option>
+        <option value="No sensory impairment">No sensory impairment</option>
+        <option value="Mild hearing or vision loss — can manage without aids">Mild hearing / vision loss</option>
+        <option value="Moderate hearing or vision loss — requires hearing aid or glasses">Moderate hearing / vision loss — requires aids</option>
+        <option value="Severe hearing or vision loss — limited reception even with aids">Severe hearing / vision loss</option>
+        <option value="Profound deafness or blindness — cannot receive audio or visual alerts">Profound deafness or blindness</option>
+        <option value="Dual sensory impairment — both hearing and vision severely affected">Dual sensory impairment</option>
+      </select>
+      <select id="m_psychological" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+        <option value="">Psychological status * (GDS)</option>
+        <option value="No psychological concerns">No psychological concerns</option>
+        <option value="Mild anxiety — tends to worry but can be reassured">Mild anxiety</option>
+        <option value="Depression — low motivation, may refuse help">Depression</option>
+        <option value="PTSD — specific triggers cause strong reactions">PTSD</option>
+        <option value="Severe anxiety or panic disorder — any sudden change triggers panic">Severe anxiety / panic disorder</option>
+      </select>
+      <input id="m_location" placeholder="Home location *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <input id="m_strongTie" placeholder="Emergency contact (name & relationship)" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <textarea id="m_note" placeholder="Special note for responders" rows="3" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;resize:vertical;box-sizing:border-box;"></textarea>
+      <div id="m_feedback" style="font-size:11px;color:#cc0000;display:none;">Please fill in all required fields.</div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button onclick="saveModal()" style="flex:1;background:#cc0000;color:#fff;border:none;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Save</button>
+        <button onclick="closeModal()" style="flex:1;background:#f5f5f5;color:#111;border:1px solid #ddd;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page-content -->
+</div><!-- end app-layout -->
+
 <script>
+let cachedAlerts = [];
+
+async function loadLiveAlert() {
+  const btn = document.getElementById('loadAlertBtn');
+  const status = document.getElementById('loadAlertStatus');
+  const select = document.getElementById('alertSelect');
+  btn.style.opacity = '0.5';
+  btn.style.pointerEvents = 'none';
+  status.textContent = 'Fetching...';
+  try {
+    const res = await fetch('https://data.cityofnewyork.us/resource/8vv7-7wx3.json?$limit=10&$order=date_and_time%20DESC');
+    const data = await res.json();
+    if (data && data.length > 0) {
+      cachedAlerts = data;
+      select.innerHTML = '<option value="">— Select an alert —</option>' +
+        data.map((a, i) => {
+          const date = new Date(a.date_and_time).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+          const title = a.notification_title || a.notificationtype || 'NYC Alert';
+          return `<option value="${i}">${date} · ${title}</option>`;
+        }).join('');
+      select.style.display = 'block';
+      status.textContent = '';
+    } else {
+      status.textContent = 'No alerts found.';
+    }
+  } catch (e) {
+    status.textContent = 'Could not load — paste manually.';
+  }
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
+function selectAlert(sel) {
+  const idx = sel.value;
+  if (idx === '') return;
+  const alert = cachedAlerts[idx];
+  const text = alert.email_body || alert.notification_title || 'No content available';
+  document.getElementById('alertInput').value = text;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('page-' + tab).classList.add('active');
+}
+
+let editingIdx = null;
+
+function renderRegistryTable() {
+  const table = document.getElementById('registryTable');
+  const count = document.getElementById('registryCount');
+  if (!table) return;
+  if (count) count.textContent = personas.length;
+  const cols = '160px 50px 100px 160px 200px 160px 180px 180px 180px 60px';
+  const headers = ['Name', 'Age', 'Language', 'Cognition', 'Mobility', 'Sensory', 'Psychological', 'Location', 'Emergency Contact', ''];
+  table.innerHTML = `
+    <div style="display:grid;grid-template-columns:${cols};background:#f5f5f5;border-bottom:2px solid #111;position:sticky;top:0;z-index:5;">
+      ${headers.map(h => `<div style="padding:10px 12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#555;white-space:nowrap;">${h}</div>`).join('')}
+    </div>
+    ${personas.map((p, i) => `
+    <div style="display:grid;grid-template-columns:${cols};border-bottom:1px solid #f0f0f0;transition:background 0.15s;" onmouseenter="this.style.background='#fafafa'" onmouseleave="this.style.background=''">
+      <div style="padding:10px 12px;font-size:11px;font-weight:600;">${p.name}<br><span style="font-size:10px;color:#888;font-weight:400;">${p.chineseName}</span></div>
+      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.age}</div>
+      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.language}</div>
+      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.cognition || '—'}</div>
+      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.mobility}</div>
+      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.sensory || '—'}</div>
+      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.psychological || '—'}</div>
+      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.location}</div>
+      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.helpers ? p.helpers.strongTie : '—'}</div>
+      <div style="padding:10px 12px;"><button onclick="openModal(${i})" style="background:none;border:1px solid #ddd;padding:3px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;color:#555;text-transform:uppercase;letter-spacing:1px;">Edit</button></div>
+    </div>`).join('')}
+  `;
+}
+
+function openModal(idx) {
+  editingIdx = idx !== undefined ? idx : null;
+  document.getElementById('modalTitle').textContent = editingIdx !== null ? 'Edit Resident' : 'Add Resident';
+  const fields = ['m_name','m_chineseName','m_age','m_language','m_cognition','m_mobility','m_sensory','m_psychological','m_location','m_strongTie','m_note'];
+  if (editingIdx !== null) {
+    const p = personas[editingIdx];
+    document.getElementById('m_name').value = p.name || '';
+    document.getElementById('m_chineseName').value = p.chineseName || '';
+    document.getElementById('m_age').value = p.age || '';
+    document.getElementById('m_language').value = p.language || '';
+    document.getElementById('m_cognition').value = p.cognition || '';
+    document.getElementById('m_mobility').value = p.mobility || '';
+    // Use loop to match sensory option exactly
+    const sensorySelect = document.getElementById('m_sensory');
+    for (let i = 0; i < sensorySelect.options.length; i++) {
+      if (sensorySelect.options[i].value === (p.sensory || '')) {
+        sensorySelect.selectedIndex = i; break;
+      }
+    }
+    const psychSelect = document.getElementById('m_psychological');
+    for (let i = 0; i < psychSelect.options.length; i++) {
+      if (psychSelect.options[i].value === (p.psychological || '')) {
+        psychSelect.selectedIndex = i; break;
+      }
+    }
+    document.getElementById('m_location').value = p.location || '';
+    document.getElementById('m_strongTie').value = p.helpers ? p.helpers.strongTie : '';
+    document.getElementById('m_note').value = p.note || '';
+  } else {
+    fields.forEach(id => { document.getElementById(id).value = ''; });
+  }
+  document.getElementById('m_feedback').style.display = 'none';
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  editingIdx = null;
+}
+
+function saveModal() {
+  const name = document.getElementById('m_name').value.trim();
+  const age = parseInt(document.getElementById('m_age').value);
+  const language = document.getElementById('m_language').value.trim();
+  const cognition = document.getElementById('m_cognition').value;
+  const mobility = document.getElementById('m_mobility').value;
+  const sensory = document.getElementById('m_sensory').value;
+  const psychological = document.getElementById('m_psychological').value;
+  const location = document.getElementById('m_location').value.trim();
+  const sensoryVal = document.getElementById('m_sensory').options[document.getElementById('m_sensory').selectedIndex].value;
+  const psychVal = document.getElementById('m_psychological').options[document.getElementById('m_psychological').selectedIndex].value;
+  if (!name || !age || !language || !cognition || !mobility || !sensoryVal || !psychVal || !location) {
+    document.getElementById('m_feedback').style.display = 'block';
+    return;
+  }
+  const newPersona = {
+    name,
+    chineseName: document.getElementById('m_chineseName').value.trim() || name,
+    age,
+    language,
+    cognition,
+    mobility,
+    sensory: sensoryVal,
+    psychological: psychVal,
+    location,
+    note: document.getElementById('m_note').value.trim() || '',
+    tags: [],
+    warning: '',
+    risk: '',
+    helpers: { strongTie: document.getElementById('m_strongTie').value.trim(), weakTie: '' }
+  };
+  if (editingIdx !== null) {
+    personas[editingIdx] = newPersona;
+  } else {
+    personas.push(newPersona);
+    const select = document.getElementById('personaSelect');
+    const option = document.createElement('option');
+    option.value = personas.length - 1;
+    option.textContent = newPersona.name;
+    select.appendChild(option);
+  }
+  closeModal();
+  renderRegistryTable();
+  renderResidentList();
+}
+
 function getApiKey() { return 'proxy'; }
 
 const personas = [
-  { name: 'Grandma Lin', chineseName: '林阿春嬤', age: 85, tags: [['Moderate Dementia','tag-red'],['Severe Hearing Loss','tag-red'],['Taiwanese Hokkien','tag-gray']], warning: 'Standard warnings will fail: cannot understand official language, cannot hear broadcasts clearly, and freezes in panic when frightened.', language: 'Taiwanese Hokkien', mobility: 'Moves slowly, requires assistance', location: 'Single-storey rural house, Hualien coastal plain', risk: 'Typhoon · Tsunami · Flood', note: 'Loud noises trigger panic — must use a gentle, calm tone' },
-  { name: 'Grandpa Lee', chineseName: '李老阿公', age: 78, tags: [['Fully Blind','tag-red'],['Bedridden','tag-red'],['Mandarin Speaker','tag-gray']], warning: 'Visual information is completely inaccessible. Bedridden and unable to self-evacuate — requires explicit, concrete physical instructions.', language: 'Mandarin', mobility: 'Bedridden, fully dependent on others', location: 'Ground-floor apartment, Tainan city low-lying area', risk: 'Flood · Dam discharge · Typhoon', note: 'Needs extremely concrete instructions, e.g. "Stay in bed and do not move"' },
-  { name: 'Grandma Chen', chineseName: '陳阿嬤', age: 90, tags: [['Severe Memory Loss','tag-red'],['Wandering Risk','tag-red'],['Taiwanese Speaker','tag-gray']], warning: 'May leave the house to search for her deceased husband during a disaster. Must be explicitly told to stay put.', language: 'Taiwanese', mobility: 'Can walk but has very poor sense of direction', location: 'Traditional courtyard house, Tainan riverside village', risk: 'Flood · Dam discharge · Typhoon', note: 'Will wander outside to look for her husband if not told to stay in place' },
-  { name: 'Grandpa Wang', chineseName: '王老阿公', age: 72, tags: [["Early Alzheimer's",'tag-red'],['Paraplegic','tag-red'],['Hakka Speaker','tag-gray']], warning: 'May become aggressive when confused. Fully wheelchair-dependent. Requires an extremely soothing tone at all times.', language: 'Hakka', mobility: 'Full-time wheelchair user, requires someone to push', location: 'Old village house on hillside, Miaoli mountain area', risk: 'Debris flow · Typhoon · Landslide', note: 'May become aggressive when confused — tone must be extremely calm' },
-  { name: 'Grandma Wu', chineseName: '吳阿嬤', age: 81, tags: [['Mild Cognitive Impairment','tag-black'],['Wheelchair-bound','tag-red'],['Severely Anxious','tag-red']], warning: 'Needs to know exactly who is coming to rescue her. Vague reassurances will worsen her panic.', language: 'Mandarin', mobility: 'Wheelchair user', location: '5th floor apartment, Kaohsiung urban district', risk: 'Chemical spill · Typhoon · Extreme heat', note: 'Must name a specific, familiar rescue person — vague promises increase panic' },
-  { name: 'Grandma Nguyen', chineseName: '阮阿嬤', age: 76, tags: [['Severe Hearing Loss','tag-red'],['Lives Alone','tag-red'],['Vietnamese Speaker','tag-gray']], warning: 'Cannot hear any audio alerts or verbal instructions. Relies entirely on visual cues and physical contact.', language: 'Vietnamese', mobility: 'Can walk independently', location: 'Coastal fishing village house, Pingtung shoreline', risk: 'Tsunami · Typhoon · Flood', note: 'Communicate through simple written notes or physical gestures — audio alone will not work' },
-  { name: 'Grandpa Siti', chineseName: '西提阿公', age: 80, tags: [['Moderate Dementia','tag-red'],['Limited Mobility','tag-red'],['Indonesian Speaker','tag-gray']], warning: 'Becomes easily disoriented in unfamiliar environments. Cannot follow multi-step instructions.', language: 'Indonesian', mobility: 'Walks with a cane, cannot move quickly', location: 'Wooden house on steep slope, Nantou mountain village', risk: 'Debris flow · Landslide · Typhoon', note: 'Keep instructions to a single step — confusion worsens rapidly under stress' },
-  { name: 'Grandma Tanaka', chineseName: '田中阿嬤', age: 83, tags: [['Severe Anxiety','tag-red'],['Frailty','tag-red'],['Japanese Speaker','tag-gray']], warning: 'Extreme anxiety response to any sudden news. Physical frailty means evacuation must be handled entirely by others.', language: 'Japanese', mobility: 'Very frail, needs full physical support to move', location: 'Elderly care home, Alishan forest area', risk: 'Forest fire · Debris flow · Typhoon', note: 'Must be reassured repeatedly and calmly — any urgency in tone triggers panic attacks' },
-  { name: 'Grandpa Kim', chineseName: '金阿公', age: 74, tags: [['Stroke Survivor','tag-red'],['Aphasia','tag-red'],['Korean Speaker','tag-gray']], warning: 'Cannot speak due to aphasia following a stroke. Understands spoken language but cannot verbally respond or call for help.', language: 'Korean', mobility: 'Limited mobility on left side, uses wall support', location: 'Ground-floor shop-house, Keelung coastal area', risk: 'Typhoon · Tsunami · Flood', note: 'Cannot call for help or express needs verbally — system must act without waiting for response' },
-  { name: 'Grandma Santos', chineseName: '桑托斯阿嬤', age: 79, tags: [['Severe Vision Impairment','tag-red'],['Diabetes','tag-red'],['Filipino Speaker','tag-gray']], warning: 'Cannot read any printed instructions or navigate unfamiliar spaces without guidance. Diabetes requires medication continuity.', language: 'Filipino (Tagalog)', mobility: 'Can walk but needs verbal guidance for navigation', location: 'Low-rise apartment block, Taichung city center', risk: 'Extreme heat · Typhoon · Chemical spill', note: 'Provide clear verbal directions with landmarks — never reference visual cues' },
-  { name: 'Grandpa Somchai', chineseName: '宋猜阿公', age: 77, tags: [["Parkinson's Disease",'tag-red'],['Tremors','tag-red'],['Thai Speaker','tag-gray']], warning: "Parkinson's tremors make any device operation unreliable. Freezing episodes may prevent self-evacuation.", language: 'Thai', mobility: 'Can walk short distances but prone to freezing episodes', location: 'Isolated hillside farmhouse, Chiayi mountain area', risk: 'Debris flow · Forest fire · Typhoon', note: 'Do not instruct to operate any buttons or devices — physical assistance is essential' },
-  { name: 'Grandma Fatimah', chineseName: '法蒂瑪阿嬤', age: 82, tags: [['Moderate Dementia','tag-red'],['Profoundly Deaf','tag-red'],['Malay Speaker','tag-gray']], warning: 'Completely deaf and has dementia — standard broadcast alerts have zero reach. Requires physical presence of a known person.', language: 'Malay', mobility: 'Moves slowly with a walker', location: 'Single-storey house in river flood plain, Chiayi county', risk: 'Flood · Dam discharge · Typhoon', note: 'Only responds to familiar faces — a stranger arriving will cause distress not comfort' },
-  { name: 'Grandpa Hassan', chineseName: '哈桑阿公', age: 75, tags: [['PTSD','tag-red'],['Wheelchair User','tag-red'],['Arabic Speaker','tag-gray']], warning: 'Disaster scenarios trigger severe PTSD responses. Loud sounds or sudden alerts can cause dissociative episodes.', language: 'Arabic', mobility: 'Permanent wheelchair user', location: 'Industrial district apartment, Kaohsiung Renwu area', risk: 'Chemical spill · Extreme heat · Typhoon', note: 'Approach with extreme calm — avoid any language that references past trauma or catastrophe' },
-  { name: 'Grandma Priya', chineseName: '普里亞阿嬤', age: 84, tags: [["Alzheimer's",'tag-red'],['Incontinence','tag-red'],['Tamil Speaker','tag-gray']], warning: "Advanced Alzheimer's means she cannot retain any new information. Each sentence must stand alone and be immediately actionable.", language: 'Tamil', mobility: 'Can walk but disoriented without supervision', location: 'High-rise care facility, Taipei urban center', risk: 'Extreme heat · Earthquake · Typhoon', note: 'Do not reference anything that happened earlier — she has no short-term memory at all' },
-  { name: 'Grandpa Zhang', chineseName: '張阿公', age: 88, tags: [['Bedridden','tag-red'],['Mute','tag-red'],['Cantonese Speaker','tag-gray']], warning: 'Cannot speak and is fully bedridden. Has no way to signal for help independently. Entirely dependent on scheduled visits.', language: 'Cantonese', mobility: 'Fully bedridden, cannot move at all', location: 'Old stone house, Hualien mountain valley', risk: 'Earthquake · Debris flow · Typhoon', note: 'Cannot respond or signal — assume he has not received help unless physically confirmed' },
-  { name: 'Grandma Dewi', chineseName: '杜薇阿嬤', age: 71, tags: [['Blind','tag-red'],['Socially Isolated','tag-red'],['Javanese Speaker','tag-gray']], warning: 'Lives completely alone with no nearby family or community ties. Blindness means she cannot navigate to safety independently.', language: 'Javanese', mobility: 'Can walk but cannot navigate unfamiliar or changed environments', location: 'Remote coastal bungalow, Taitung shoreline', risk: 'Tsunami · Typhoon · Flood', note: 'No one nearby will check on her — system must actively dispatch a helper, not just broadcast' },
-  { name: 'Grandpa Bautista', chineseName: '包蒂斯塔阿公', age: 73, tags: [['Wheelchair User','tag-red'],['Clinical Depression','tag-red'],['Tagalog Speaker','tag-gray']], warning: 'Depression may cause him to refuse help or not respond to alerts. Low motivation to self-preserve during crises.', language: 'Tagalog', mobility: 'Permanent wheelchair user', location: 'Ground-floor flat near nuclear exclusion zone, Pingtung', risk: 'Nuclear accident · Typhoon · Tsunami', note: 'May not respond or may refuse help — the helper must be someone he trusts personally' },
-  { name: 'Grandma Yuki', chineseName: '雪阿嬤', age: 86, tags: [['Dementia','tag-red'],['Wandering Risk','tag-red'],['Japanese Speaker','tag-gray']], warning: 'Has wandered outside at night multiple times. During disasters she is likely to leave the building if not physically prevented.', language: 'Japanese', mobility: 'Mobile but direction-blind', location: 'Snowbound mountain village house, Hehuanshan area', risk: 'Blizzard · Debris flow · Typhoon', note: 'Must be told to stay in a specific named room — generic "stay inside" is insufficient' },
-  { name: 'Grandpa Chandra', chineseName: '錢德拉阿公', age: 69, tags: [['Early Dementia','tag-black'],['Diabetes','tag-red'],['Hindi Speaker','tag-gray']], warning: 'Early-stage dementia with insulin dependency. Stress can cause blood sugar dysregulation on top of cognitive impairment.', language: 'Hindi', mobility: 'Can walk and move independently', location: 'Apartment near river embankment, Taichung Wufeng', risk: 'Flood · Debris flow · Typhoon', note: 'Medication continuity is critical — helper must confirm insulin has been taken' },
-  { name: 'Grandma Park', chineseName: '朴阿嬤', age: 91, tags: [['Bedridden','tag-red'],['Severe Hearing Loss','tag-red'],['Korean Speaker','tag-gray']], warning: 'Oldest person in the registry. Bedridden and nearly deaf — has no ability to receive alerts or call for help independently.', language: 'Korean', mobility: 'Fully bedridden', location: 'Ground-floor room in nursing home, Yilan coastal town', risk: 'Typhoon · Tsunami · Flood', note: 'Needs the loudest possible speaker volume and a helper who knows her personally' },
-  { name: 'Grandpa Ah-Tsai', chineseName: '阿財阿公', age: 87, tags: [['Severe Dementia','tag-red'],['Aggressive Episodes','tag-red'],['Southern Min Speaker','tag-gray']], warning: 'Severe dementia with unpredictable aggressive episodes. Does not recognize most people including some family members.', language: 'Southern Min', mobility: 'Can walk but wanders and cannot be redirected verbally', location: 'Old farmhouse on Tainan flood plain', risk: 'Flood · Dam discharge · Typhoon', note: 'Only one specific family member can calm him — system must notify that person directly' }
+  { name: 'Carmen', chineseName: 'Carmen Rivera', age: 78, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Mott Haven, Bronx, NY', note: 'Speaks very little English — all communication must be in Spanish. Responds well to familiar voices.', helpers: { strongTie: 'daughter Sofia Rivera (347-555-0192)', weakTie: '' } },
+  { name: 'Wei', chineseName: '黃偉明', age: 82, language: 'Cantonese', ttsLang: 'zh-HK', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Chinatown, Manhattan, NY', note: 'Only responds to Cantonese. Loud sounds trigger agitation. Familiar caregiver must be present.', helpers: { strongTie: 'son Danny Wong (212-555-0341)', weakTie: '' } },
+  { name: 'Irina', chineseName: 'Irina Volkov', age: 75, language: 'Russian', ttsLang: 'ru-RU', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Brighton Beach, Brooklyn, NY', note: 'Speaks limited English. Very independent but anxious about leaving her building alone during emergencies.', helpers: { strongTie: 'neighbor Olga Petrov on same floor (718-555-0287)', weakTie: '' } },
+  { name: 'Paige', chineseName: 'Paige Morrison', age: 91, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'St. George, Staten Island, NY', note: 'Fully bedridden and nearly deaf. Needs maximum speaker volume. Only responds to her named caregiver Mary.', helpers: { strongTie: 'caregiver Mary Donnelly (718-555-0156)', weakTie: '' } },
+  { name: 'Rosa', chineseName: 'Rosa Mendez', age: 84, language: 'Spanish', ttsLang: 'es-US', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Washington Heights, Manhattan, NY', note: 'Wanders if not supervised. Any urgency in tone causes panic. Must be spoken to very slowly in Spanish.', helpers: { strongTie: 'granddaughter Elena Mendez (646-555-0419)', weakTie: '' } },
+  { name: 'James', chineseName: 'James Washington', age: 79, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Bedford-Stuyvesant, Brooklyn, NY', note: 'Clinically depressed — may refuse to evacuate. Must be contacted by someone he personally trusts.', helpers: { strongTie: 'son Marcus Washington (718-555-0623)', weakTie: '' } },
+  { name: 'Lily', chineseName: '林玉蘭', age: 86, language: 'Mandarin (Traditional)', ttsLang: 'zh-TW', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Flushing, Queens, NY', note: 'Taiwanese background — uses Traditional Chinese. Gentle and cooperative but needs guidance in all directions.', helpers: { strongTie: 'daughter Jenny Lin (718-555-0772)', weakTie: '' } },
+  { name: 'Yusuf', chineseName: 'Yusuf Rahman', age: 73, language: 'Bengali', ttsLang: 'bn-BD', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Jackson Heights, Queens, NY', note: 'Speaks Bengali and limited English. Uses hearing aids. Cooperative and calm when spoken to clearly.', helpers: { strongTie: 'son Karim Rahman (718-555-0834)', weakTie: '' } },
+  { name: 'Grace', chineseName: 'Grace Belizaire', age: 88, language: 'Haitian Creole', ttsLang: 'fr-HT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flatbush, Brooklyn, NY', note: 'Haitian Creole is primary language. Wheelchair user — cannot self-evacuate. Reassured by prayer and familiar voices.', helpers: { strongTie: 'niece Marie Pierre (718-555-0945)', weakTie: '' } },
+  { name: 'Sun-Hee', chineseName: '박선희', age: 77, language: 'Korean', ttsLang: 'ko-KR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Flushing, Queens, NY', note: 'Severe hearing loss — speaker volume must be maximum. PTSD from past trauma; avoid alarming language.', helpers: { strongTie: 'daughter Jiyoung Park (718-555-1023)', weakTie: '' } },
+  { name: 'Antonio', chineseName: 'Antonio Guerrero', age: 80, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Soundview, Bronx, NY', note: 'Early memory loss — needs simple, repeated instructions. Wears hearing aids. Responds well to calm Spanish.', helpers: { strongTie: 'wife Carmen Guerrero at home (718-555-1134)', weakTie: '' } },
+  { name: 'Natasha', chineseName: 'Natasha Brodsky', age: 83, language: 'Russian', ttsLang: 'ru-RU', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Sheepshead Bay, Brooklyn, NY', note: 'Moderate dementia with severe anxiety. Each sentence must be independent. Never use urgent tone.', helpers: { strongTie: 'son Boris Brodsky (718-555-1267)', weakTie: '' } },
+  { name: 'Dorothy', chineseName: 'Dorothy Mae Johnson', age: 92, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'No psychological concerns', location: 'Harlem, Manhattan, NY', note: 'Fully bedridden and hard of hearing. Very calm if spoken to gently. Cannot call for help independently.', helpers: { strongTie: 'daughter Patricia Johnson (212-555-1389)', weakTie: '' } },
+  { name: 'Pham', chineseName: 'Phạm Văn Đức', age: 76, language: 'Vietnamese', ttsLang: 'vi-VN', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Sunset Park, Brooklyn, NY', note: 'Vietnamese speaker with PTSD. Avoid references to disaster, danger, or catastrophe. Needs calm reassurance.', helpers: { strongTie: 'son Minh Pham (718-555-1456)', weakTie: '' } },
+  { name: 'Maria', chineseName: 'María Flores', age: 85, language: 'Spanish', ttsLang: 'es-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Jackson Heights, Queens, NY', note: 'Severe dementia — no short-term memory. Each sentence must stand alone. Panics easily. Spanish only.', helpers: { strongTie: 'daughter Isabel Flores (718-555-1578)', weakTie: '' } },
+  { name: 'Enzo', chineseName: 'Enzo Caruso', age: 81, language: 'Italian', ttsLang: 'it-IT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Bensonhurst, Brooklyn, NY', note: 'Italian-speaking, mild memory issues. Wears hearing aids. Cooperative — responds well to direct simple instructions.', helpers: { strongTie: 'son Marco Caruso (718-555-1689)', weakTie: '' } },
+  { name: 'Aisha', chineseName: 'Aisha Diallo', age: 74, language: 'French', ttsLang: 'fr-FR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Harlem, Manhattan, NY', note: 'West African background, French-speaking. Clinically depressed — may withdraw during crisis. Needs warm, personal tone.', helpers: { strongTie: 'friend Aminata Bah (212-555-1723)', weakTie: '' } },
+  { name: 'Hyun', chineseName: '이현우', age: 89, language: 'Korean', ttsLang: 'ko-KR', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Bayside, Queens, NY', note: 'Moderate dementia and severe hearing loss — maximum speaker volume required. Wheelchair user. Korean only.', helpers: { strongTie: 'daughter Soyeon Lee (718-555-1845)', weakTie: '' } },
+  { name: 'Mei', chineseName: '张梅', age: 80, language: 'Mandarin (Simplified)', ttsLang: 'zh-CN', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flushing, Queens, NY', note: 'Mainland China background — Simplified Chinese. Early memory loss. Calm if given clear, simple instructions in Mandarin.', helpers: { strongTie: 'son Wei Zhang (718-555-1967)', weakTie: '' } },
+  { name: 'Ruth', chineseName: 'Ruth Ellen Cooper', age: 87, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'New Dorp, Staten Island, NY', note: 'Fully alert and communicative but wheelchair-bound. Needs caregiver to move her. Wears hearing aids.', helpers: { strongTie: 'daughter Carol Cooper (718-555-2089)', weakTie: '' } }
 ];
 
 const mockScript = "This person is safe. Please stay where you are. Someone you know is coming to help you right now.";
@@ -502,21 +817,24 @@ function addNewPersona() {
   const chineseName = document.getElementById('sw_chineseName').value.trim() || name;
   const age = parseInt(document.getElementById('sw_age').value);
   const language = document.getElementById('sw_language').value.trim();
-  const disability = document.getElementById('sw_disability').value.trim();
   const mobility = document.getElementById('sw_mobility').value.trim();
   const location = document.getElementById('sw_location').value.trim() || 'Unknown';
-  const risk = document.getElementById('sw_risk').value.trim() || 'Unknown';
-  const warning = document.getElementById('sw_warning').value.trim() || 'Standard warnings may not reach this person effectively.';
+  const risk = '';
+  const warning = '';
   const note = document.getElementById('sw_note').value.trim() || 'Handle with care.';
   const feedback = document.getElementById('sw_feedback');
 
-  if (!name || !age || !language || !disability || !mobility) {
+  if (!name || !age || !language || !mobility) {
     feedback.style.display = 'block';
     return;
   }
   feedback.style.display = 'none';
 
-  const newPersona = { name, chineseName, age, tags: [[disability,'tag-red'],[language + ' Speaker','tag-gray']], warning, language, mobility, location, risk, note };
+  const cognition = document.getElementById('sw_cognition').value;
+  const sensory = document.getElementById('sw_sensory').value;
+  const psychological = document.getElementById('sw_psychological').value;
+  if (!cognition || !sensory || !psychological) { feedback.style.display = 'block'; return; }
+  const newPersona = { name, chineseName, age, tags: [[disability,'tag-red'],[cognition,'tag-black'],[language + ' Speaker','tag-gray']], warning, language, mobility, location, risk, note, sensory, psychological, helpers: { strongTie: '', weakTie: '' } };
   personas.push(newPersona);
   const idx = personas.length - 1;
 
@@ -532,7 +850,7 @@ function addNewPersona() {
   saved.push(newPersona);
   localStorage.setItem('guardian_custom_personas', JSON.stringify(saved));
 
-  ['sw_name','sw_chineseName','sw_age','sw_language','sw_disability','sw_mobility','sw_location','sw_risk','sw_warning','sw_note'].forEach(id => {
+  ['sw_name','sw_chineseName','sw_age','sw_language','sw_mobility','sw_cognition','sw_sensory','sw_psychological','sw_location','sw_note'].forEach(id => {
     document.getElementById(id).value = '';
   });
   toggleForm();
@@ -596,6 +914,88 @@ function clearHistory() {
   renderHistory();
 }
 
+function toggleSelectAll(cb) {
+  const boxes = document.querySelectorAll('.resident-cb');
+  boxes.forEach(b => b.checked = cb.checked);
+  updateSelectedCount();
+}
+
+function updateSelectedCount(e, idx) {
+  const total = document.querySelectorAll('.resident-cb').length;
+  const checked = document.querySelectorAll('.resident-cb:checked').length;
+  document.getElementById('selectedCount').textContent = checked;
+  const selectAll = document.getElementById('selectAll');
+  selectAll.checked = checked === total;
+  selectAll.indeterminate = checked > 0 && checked < total;
+}
+
+function selectResident(idx) {
+  const select = document.getElementById('personaSelect');
+  select.value = idx;
+  updatePersona();
+  // Reset all rows
+  document.querySelectorAll('.resident-row').forEach(r => {
+    r.style.background = '';
+    r.dataset.selected = 'false';
+  });
+  document.querySelectorAll('.resident-indicator').forEach(ind => {
+    ind.style.background = 'transparent';
+  });
+  // Highlight selected row
+  const row = document.getElementById('resident-row-' + idx);
+  if (row) {
+    row.style.background = '#f5f5f5';
+    row.dataset.selected = 'true';
+  }
+  const indicator = document.getElementById('indicator-' + idx);
+  if (indicator) indicator.style.background = '#cc0000';
+}
+
+function renderResidentList() {
+  const list = document.getElementById('residentList');
+  if (!list) return;
+  list.innerHTML = personas.map((p, i) => `
+    <div class="resident-row" id="resident-row-${i}"
+      style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s;"
+      onmouseenter="this.style.background='#f9f9f9'"
+      onmouseleave="this.style.background=this.dataset.selected==='true'?'#f5f5f5':''"
+      onclick="selectResident(${i})">
+      <input type="checkbox" class="resident-cb" checked
+        onchange="updateSelectedCount(event, ${i})"
+        onclick="event.stopPropagation()"
+        style="cursor:pointer;accent-color:#cc0000;flex-shrink:0;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+        <div style="font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.location}</div>
+      </div>
+      <div class="resident-indicator" id="indicator-${i}" style="width:3px;height:24px;background:transparent;flex-shrink:0;border-radius:2px;transition:background 0.15s;"></div>
+    </div>
+  `).join('');
+}
+
+function makeColumnsResizable() {
+  const cols = document.querySelectorAll('.col');
+  cols.forEach((col, i) => {
+    if (i === cols.length - 1) return;
+    const resizer = document.createElement('div');
+    resizer.style.cssText = 'width:4px;background:#ddd;cursor:col-resize;flex-shrink:0;';
+    resizer.addEventListener('mouseenter', () => resizer.style.background = '#999');
+    resizer.addEventListener('mouseleave', () => resizer.style.background = '#ddd');
+    let startX, startW;
+    resizer.addEventListener('mousedown', e => {
+      startX = e.clientX;
+      startW = col.offsetWidth;
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', () => document.removeEventListener('mousemove', onMove));
+    });
+    function onMove(e) {
+      col.style.flex = 'none';
+      col.style.width = Math.max(150, startW + e.clientX - startX) + 'px';
+    }
+    col.after(resizer);
+  });
+}
+
 function init() {
   const grille = document.getElementById('grilleDots');
   for (let i = 0; i < 70; i++) {
@@ -606,6 +1006,9 @@ function init() {
   loadState();
   loadCustomPersonas();
   updatePersona();
+  renderResidentList();
+  makeColumnsResizable();
+  renderRegistryTable();
   renderHistory();
   updateClock();
   setInterval(updateClock, 1000);
@@ -621,18 +1024,54 @@ function updatePersona() {
   currentPersonaIdx = parseInt(select.value) || 0;
   const p = personas[currentPersonaIdx];
   if (!p) return;
+  // Generate tags from four dimensions
+  const autoTags = [];
+  // Cognition
+  if (p.cognition) {
+    if (p.cognition.includes('CDR 3')) autoTags.push(['SEVERE DEMENTIA', 'tag-red']);
+    else if (p.cognition.includes('CDR 2')) autoTags.push(['MODERATE DEMENTIA', 'tag-red']);
+    else if (p.cognition.includes('CDR 0.5')) autoTags.push(['MILD COGNITIVE IMPAIRMENT', 'tag-red']);
+  }
+  // Mobility
+  if (p.mobility) {
+    if (p.mobility.toLowerCase().includes('bedridden')) autoTags.push(['FULLY BEDRIDDEN', 'tag-red']);
+    else if (p.mobility.toLowerCase().includes('wheelchair') || p.mobility.toLowerCase().includes('full assistance')) autoTags.push(['NEEDS FULL ASSISTANCE', 'tag-red']);
+    else if (p.mobility.toLowerCase().includes('assistance') || p.mobility.toLowerCase().includes('cane') || p.mobility.toLowerCase().includes('support') || p.mobility.toLowerCase().includes('frail')) autoTags.push(['NEEDS PARTIAL ASSISTANCE', 'tag-red']);
+  }
+  // Sensory
+  if (p.sensory && !p.sensory.includes('No sensory')) {
+    if (p.sensory.includes('Profound')) autoTags.push(['PROFOUND SENSORY LOSS', 'tag-red']);
+    else if (p.sensory.includes('Dual')) autoTags.push(['DUAL SENSORY IMPAIRMENT', 'tag-red']);
+    else if (p.sensory.includes('Severe')) autoTags.push(['SEVERE SENSORY LOSS', 'tag-red']);
+    else autoTags.push(['MILD SENSORY LOSS', 'tag-red']);
+  }
+  // Psychological
+  if (p.psychological && !p.psychological.includes('No psychological')) {
+    if (p.psychological.includes('Severe anxiety')) autoTags.push(['SEVERE ANXIETY', 'tag-red']);
+    else if (p.psychological.includes('PTSD')) autoTags.push(['PTSD', 'tag-red']);
+    else if (p.psychological.includes('Depression')) autoTags.push(['DEPRESSION', 'tag-red']);
+    else autoTags.push(['MILD ANXIETY', 'tag-red']);
+  }
+  // Language (black)
+  autoTags.push([p.language.toUpperCase() + ' SPEAKER', 'tag-gray']);
+
   document.getElementById('personaCard').innerHTML = `
     <div class="persona-name">${p.name}</div>
     <div class="persona-sub">${p.chineseName} · Age ${p.age} · ${p.language}</div>
-    <div class="tags">${p.tags.map(([t,c]) => `<span class="tag ${c}">${t}</span>`).join('')}</div>
+    <div class="tags" style="margin-top:10px;">${autoTags.map(([t,c]) => `<span class="tag ${c}">${t}</span>`).join('')}</div>
     <div class="persona-note">
-      <span class="warn"></span>${p.warning}<br><br>
-      <strong>Location:</strong> ${p.location}<br>
-      <strong>At risk from:</strong> ${p.risk}<br>
-      <strong>Mobility:</strong> ${p.mobility}<br>
-      <strong>Note:</strong> ${p.note}<br><br>
-      <strong>Strong tie:</strong> ${p.helpers ? p.helpers.strongTie : '—'}<br>
-      <strong>Weak tie:</strong> ${p.helpers ? p.helpers.weakTie : '—'}
+      <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.07-4.53A3 3 0 0 1 4.5 9.5a3 3 0 0 1 .5-1.66A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.07-4.53A3 3 0 0 0 19.5 9.5a3 3 0 0 0-.5-1.66A2.5 2.5 0 0 0 14.5 2Z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Cognition</span><span>${p.cognition || '—'}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Mobility</span><span>${p.mobility}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Sensory</span><span>${p.sensory || '—'}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Psychological</span><span>${p.psychological || '—'}</span></div>
+      </div>
+      <div style="border-top:1px solid #eee;margin:12px 0;"></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Location</span><span>${p.location}</span></div>
+      <div style="border-top:1px solid #eee;margin:12px 0;"></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.93 3.37 2 2 0 0 1 3.91 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Emergency Contact</span><span>${p.helpers ? p.helpers.strongTie : '—'}</span></div>
+      <div style="border-top:1px solid #eee;margin:12px 0;"></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Note</span><span>${p.note}</span></div>
     </div>
   `;
   document.getElementById('personaMatch').textContent = p.name;
@@ -734,31 +1173,46 @@ async function generateScript(alertText) {
 Translate the official disaster warning into a calming broadcast script for a specific vulnerable elderly person.
 
 STEP 1 — MOBILITY + DISASTER TYPE determines the core instruction:
-- Bedridden or wheelchair-bound AND disaster allows staying in place (earthquake, typhoon, high-floor flood): tell them to stay exactly where they are. Mention that ${persona.helpers.weakTie} is nearby and coming soon.
-- Bedridden or wheelchair-bound AND disaster requires leaving (fire, chemical spill, rising floodwater, tsunami): tell them a named caregiver is coming right now to carry or move them — frame it as being looked after, not an emergency. Mention ${persona.helpers.strongTie} is also on the way.
-- Can walk BUT has dementia or Alzheimer's: do NOT give a destination. Give one single physical action they can do right now where they stand (e.g. "please hold my hand"). Imply a caregiver is physically present.
-- Can walk with no cognitive impairment AND disaster requires leaving: give one simple movement instruction toward a familiar nearby place — never use the word "evacuate". Mention ${persona.helpers.weakTie} will meet them there.
-- Can walk with no cognitive impairment AND disaster allows staying: tell them to stay inside. Mention ${persona.helpers.strongTie} has been notified and is coming.
+- Fully bedridden (EMS 0-4) AND disaster allows staying in place (earthquake, typhoon, high-floor flood): tell them to stay exactly where they are. Mention ${persona.helpers.strongTie} has been notified and is coming.
+- Fully bedridden (EMS 0-4) AND disaster requires leaving (fire, chemical spill, rising floodwater, tsunami): tell them a caregiver is coming right now to carry them — frame it as being looked after, not an emergency. Mention ${persona.helpers.strongTie} is on the way.
+- Needs full or partial assistance (EMS 5-13) AND has dementia (CDR 2-3): do NOT give a destination. Give one single physical action they can do right now where they stand (e.g. "please hold my hand"). Imply a caregiver is physically present.
+- Needs full or partial assistance (EMS 5-13) AND no severe cognitive impairment: tell them to stay where they are and that ${persona.helpers.strongTie} is coming to help them move.
+- Independent (EMS 14+) AND disaster requires leaving: give one simple movement instruction toward a familiar nearby place — never use the word "evacuate". Mention ${persona.helpers.strongTie} will meet them there.
+- Independent (EMS 14+) AND disaster allows staying: tell them to stay inside. Mention ${persona.helpers.strongTie} has been notified and is coming.
 
 STEP 2 — COGNITION determines sentence structure and length:
-- Severe dementia or Alzheimer's: each sentence must be completely independent and immediately actionable. Assume the elder will not remember the previous sentence. Use 2-4 very short sentences.
-- Mild cognitive impairment or early dementia: sentences can have light logical flow but must remain extremely simple. Use 3 sentences maximum.
-- No cognitive impairment: sentences can connect naturally. Use exactly 3 sentences.
+- Severe dementia (CDR 3): each sentence must be completely independent and immediately actionable. Assume the elder will not remember the previous sentence. Use 2-4 very short sentences maximum.
+- Moderate dementia (CDR 2): sentences can have minimal logical flow but must be extremely simple and short. Use 3 sentences maximum.
+- Mild cognitive impairment (CDR 0.5-1): sentences can connect naturally but must remain simple. Use 3 sentences maximum.
+- No cognitive impairment (CDR 0): sentences can connect naturally with full clarity. Use exactly 3 sentences.
 
 STEP 3 — LANGUAGE determines output language:
-- You MUST write the entire script in: ${persona.language}
+- You MUST write the entire script in: ${persona.language} (TTS language code: ${persona.ttsLang}). Do not use any other language, not even a single word.
 - Do not use any other language, not even a single word.
 
 STEP 4 — HELPERS, always name someone specific:
-- If immediate physical help is needed: name ${persona.helpers.weakTie} as arriving first (they are closer), and mention ${persona.helpers.strongTie} has also been notified.
-- If the situation allows waiting: name ${persona.helpers.strongTie} as the person coming, and mention ${persona.helpers.weakTie} is also nearby.
+- Always name ${persona.helpers.strongTie} as the person coming to help.
 - Never use vague language like "someone will come" — always use a real name from the profile.
+
+STEP 5 — SENSORY determines delivery adaptation:
+- Profound deafness or dual sensory impairment: note in the script that a caregiver must deliver this message in person — audio alone will not reach this person.
+- Severe hearing loss: keep sentences very short and use simple words that are easier to lip-read or comprehend at high volume.
+- No sensory impairment: normal delivery.
+
+STEP 6 — PSYCHOLOGICAL determines tone adjustment:
+- Severe anxiety or panic disorder: use an extremely slow, gentle tone. Never imply urgency. Repeat the reassurance in every sentence.
+- PTSD: avoid any language referencing past trauma, disaster, or catastrophe. Focus entirely on the present moment and who is coming to help.
+- Depression: use warm, personal language. Name the helper directly and emphasise that they specifically care about this person.
+- Mild anxiety: maintain a calm and reassuring tone throughout.
+- No psychological concerns: normal tone.
 
 TONE RULES:
 - Warm, gentle, and deeply reassuring at all times.
 - Never use words like "danger", "death", "fire", "toxic", "evacuate", "emergency", or any frightening language.
 - Describe all situations using only positive or neutral framing.
 - Special note: ${persona.note}
+- Sensory status: ${persona.sensory || 'not specified'}
+- Psychological status: ${persona.psychological || 'not specified'}
 
 Elder profile:
 - Name: ${persona.name}
@@ -769,7 +1223,6 @@ Elder profile:
 - Home: ${persona.location}
 - Known disaster risks for this location: ${persona.risk}
 - Strong tie (family / close contact): ${persona.helpers.strongTie}
-- Weak tie (neighbour / nearby helper): ${persona.helpers.weakTie}
 
 Output only the broadcast script itself — no preamble, no explanation.`;
 
@@ -801,7 +1254,7 @@ function blobToBase64(blob) {
   });
 }
 
-const PI_URL = 'http://192.168.1.124:5001';
+const PI_URL = 'http://localhost:5001'; // change to Pi IP when ready
 
 async function generateAudio(text) {
   try {
@@ -813,12 +1266,15 @@ async function generateAudio(text) {
     const blob = await response.blob();
     const url = URL.createObjectURL(blob);
 
-    // Browser playback
+    // Browser playback - show only when ready
     const player = document.getElementById('audioPlayer');
     const wrapper = document.getElementById('audioWrapper');
+    wrapper.style.display = 'none';
     player.src = url;
-    wrapper.style.display = 'block';
-    player.play().catch(() => {});
+    player.oncanplaythrough = () => {
+      wrapper.style.display = 'block';
+      player.play().catch(() => {});
+    };
 
     // Pi broadcast
     const base64 = await blobToBase64(blob);
@@ -837,3 +1293,4 @@ init();
 </script>
 </body>
 </html>
+
