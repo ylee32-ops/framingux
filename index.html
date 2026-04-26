@@ -443,7 +443,7 @@
         </select>
       </div>
       <textarea id="alertInput" rows="8" style="width:100%;border:1px solid #bbb;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.8;color:#444;resize:vertical;border-left:3px solid #cc0000;background:#fff;outline:none;margin-bottom:16px;" placeholder="Paste any official disaster warning text here..."></textarea>
-      <button class="alert-btn" id="alertBtn" onclick="issueAlert()">Issue Alert</button>
+      <button class="alert-btn" id="alertBtn" onclick="processAlert()">Process Alert</button>
     </div>
   </div>
 
@@ -481,6 +481,9 @@
         <option value="19">Ruth — Age 87 / English (Staten Island)</option>
       </select>
       <div class="persona-card" id="personaCard"></div>
+      <div id="broadcastBtnWrap" style="display:none;padding:0 16px 16px;">
+        <button class="alert-btn" id="broadcastBtn" onclick="broadcastToResident()" style="background:#111;">Broadcast</button>
+      </div>
         </div>
       </div>
     </div>
@@ -957,6 +960,10 @@ function selectResident(idx) {
   }
   const indicator = document.getElementById('indicator-' + idx);
   if (indicator) indicator.style.background = '#cc0000';
+  // Show broadcast button if alert has been processed
+  if (currentAlertText) {
+    document.getElementById('broadcastBtnWrap').style.display = 'block';
+  }
 }
 
 function getAffectedAreas(alertText) {
@@ -1150,101 +1157,118 @@ function matchResidents(areas) {
   }, []);
 }
 
-async function issueAlert() {
-  if (isProcessing) return;
+let currentAffectedIndices = [];
+let currentAlertText = '';
 
+async function processAlert() {
   const alertText = document.getElementById('alertInput').value.trim();
   if (!alertText) {
     document.getElementById('alertInput').style.borderColor = '#cc0000';
     document.getElementById('alertInput').placeholder = 'Please enter an official warning text first.';
     return;
   }
-  document.getElementById('alertInput').style.borderColor = '#cc0000';
-  isProcessing = true;
+
+  currentAlertText = alertText;
 
   const btn = document.getElementById('alertBtn');
   const dot = document.getElementById('statusDot');
   const banner = document.getElementById('alertBanner');
-  const radio = document.getElementById('radioBody');
   const scriptEl = document.getElementById('scriptText');
-  const broadcastStatus = document.getElementById('broadcastStatus');
-  const lastPush = document.getElementById('lastPush');
+  const log = document.getElementById('processingLog');
 
   btn.disabled = true;
   dot.classList.add('alert');
   banner.classList.add('show');
   setTimeout(() => banner.classList.remove('show'), 3000);
+  log.innerHTML = '';
+  scriptEl.textContent = 'Awaiting broadcast...';
+  scriptEl.className = 'script-box loading';
+  document.getElementById('broadcastBtnWrap').style.display = 'none';
+  document.getElementById('audioWrapper').style.display = 'none';
 
-  setPipelineStep(1);
+  addLog('Alert received from NYC Emergency Management.', '#cc0000');
+  await sleep(700);
+  addLog('Analyzing affected areas...');
+  await sleep(800);
 
-  // Area detection + resident filtering
-  const alertText2 = document.getElementById('alertInput').value.trim();
-  const detectedAreas = getAffectedAreas(alertText2);
-  const affectedIndices = filterResidentsByAreas(detectedAreas);
+  const areas = detectAffectedAreas(alertText);
+  if (areas.length > 0) {
+    addLog('Detected: ' + areas.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', '), '#111');
+  } else {
+    addLog('No specific area detected — matching all residents.', '#111');
+  }
+  await sleep(600);
 
+  currentAffectedIndices = matchResidents(areas);
+  addLog('Matched ' + currentAffectedIndices.length + ' resident' + (currentAffectedIndices.length !== 1 ? 's' : '') + ' in registry.', '#111');
+
+  const statusEl = document.getElementById('registryStatus');
+  if (statusEl) statusEl.textContent = currentAffectedIndices.length + ' residents in affected area';
+
+  renderResidentList(currentAffectedIndices);
+
+  addLog('Select a resident to generate their personalized broadcast.', '#888');
+
+  document.getElementById('broadcastStatus').textContent = 'Ready';
+  btn.disabled = false;
+  dot.classList.remove('alert');
+}
+
+async function broadcastToResident() {
+  if (isProcessing) return;
+  if (!currentAlertText) return;
+
+  isProcessing = true;
+  const btn = document.getElementById('broadcastBtn');
+  const dot = document.getElementById('statusDot');
+  const radio = document.getElementById('radioBody');
+  const scriptEl = document.getElementById('scriptText');
+  const log = document.getElementById('processingLog');
+
+  btn.disabled = true;
+  dot.classList.add('alert');
+  log.innerHTML = '';
+  scriptEl.textContent = 'Generating...';
   scriptEl.className = 'script-box loading';
 
-  // Processing log
-  const logLines = [
-    'Analyzing alert...',
-    detectedAreas.length > 0 ? `Detected area: ${detectedAreas.join(', ')}` : 'No specific area detected — alerting all residents',
-    `Matched ${affectedIndices.length} resident${affectedIndices.length !== 1 ? 's' : ''} in registry`,
-    `Generating personalized broadcast for ${personas[currentPersonaIdx].name}...`
-  ];
+  const persona = personas[currentPersonaIdx];
+  addLog('Generating personalized broadcast for ' + persona.name + '...', '#cc0000');
+  await sleep(400);
 
-  for (const line of logLines) {
-    scriptEl.textContent = line;
-    await sleep(700);
-  }
+  document.getElementById('broadcastStatus').textContent = 'Processing';
 
-  // Update resident list with filtered view
-  renderResidentList(affectedIndices);
-  const label = document.getElementById('affectedLabel');
-  if (label) label.textContent = `${affectedIndices.length} resident${affectedIndices.length !== 1 ? 's' : ''} in affected area`;
-
-  setPipelineStep(2);
-  await sleep(300);
-
-  setPipelineStep(3);
-  broadcastStatus.textContent = 'Processing';
-  await sleep(200);
-
-  const result = await generateScript(alertText);
+  const result = await generateScript(currentAlertText);
   const script = result.script;
   scriptEl.textContent = script;
   scriptEl.className = 'script-box';
 
-  // Display reasoning in processing log
   if (result.reasoning) {
     const sep = document.createElement('div');
     sep.style.cssText = 'margin:12px 0 8px;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;';
     sep.textContent = '> Clinical reasoning';
-    document.getElementById('processingLog').appendChild(sep);
+    log.appendChild(sep);
     const reasoningEl = document.createElement('div');
     reasoningEl.style.cssText = 'padding:12px;border-left:3px solid #ddd;font-size:11px;line-height:1.9;color:#444;white-space:pre-wrap;';
     reasoningEl.textContent = result.reasoning;
-    document.getElementById('processingLog').appendChild(reasoningEl);
+    log.appendChild(reasoningEl);
   }
 
-  addLog('Script ready in ' + personas[currentPersonaIdx].language + '.', '#111');
+  addLog('Script ready in ' + persona.language + '.', '#111');
+  saveAlertToHistory(persona, currentAlertText, script);
 
-  saveAlertToHistory(personas[currentPersonaIdx], alertText, script);
-
-  setPipelineStep(4);
-  await sleep(500);
-
+  await sleep(400);
+  addLog('Synthesizing audio...', '#888');
   await generateAudio(script);
 
-  setPipelineStep(5);
+  addLog('Broadcasting to bedside device.', '#cc0000');
   radio.classList.add('active');
   document.getElementById('freqDisplay').textContent = '107.3 FM';
-
-  broadcastStatus.textContent = 'Broadcasting';
+  document.getElementById('broadcastStatus').textContent = 'Broadcasting';
   document.getElementById('broadcastStatus').className = 'active-val';
-  lastPush.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+  document.getElementById('lastPush').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
 
   await sleep(3000);
-  broadcastStatus.textContent = 'Complete';
+  document.getElementById('broadcastStatus').textContent = 'Complete';
   document.getElementById('broadcastStatus').className = '';
   dot.classList.remove('alert');
   btn.disabled = false;
@@ -1394,6 +1418,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
