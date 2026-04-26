@@ -1107,6 +1107,7 @@ function setPipelineStep(stepNum) {
   for (let i = 1; i <= 5; i++) {
     const step = document.getElementById(`step${i}`);
     const line = document.getElementById(`line${i}`);
+    if (!step) continue;
     step.className = 'pipe-step';
     if (line) line.className = 'pipe-line';
     if (i < stepNum) { step.classList.add('done'); if (line) line.classList.add('done'); }
@@ -1354,7 +1355,7 @@ function blobToBase64(blob) {
   });
 }
 
-const PI_URL = 'http://localhost:5001'; // change to Pi IP when ready
+const PI_URL = 'http://192.168.1.124:5001'; // change to Pi IP when ready
 
 async function generateAudio(text) {
   try {
@@ -1393,6 +1394,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
