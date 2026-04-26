@@ -1082,14 +1082,13 @@ function setPipelineStep(stepNum) {
   for (let i = 1; i <= 5; i++) {
     const step = document.getElementById(`step${i}`);
     const line = document.getElementById(`line${i}`);
-    if (!step) continue;
     step.className = 'pipe-step';
     if (line) line.className = 'pipe-line';
     if (i < stepNum) { step.classList.add('done'); if (line) line.classList.add('done'); }
     else if (i === stepNum) { step.classList.add('active'); }
   }
 }
- 
+
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function issueAlert() {
@@ -1173,6 +1172,25 @@ async function generateScript(alertText) {
   const systemPrompt = `You are a specialist in geriatric dementia care and emergency communication.
 Translate the official disaster warning into a calming broadcast script for a specific vulnerable elderly person.
 
+STEP 0 — SITUATION FRAMING comes first, always one sentence:
+Describe what is happening in completely neutral, non-alarming language. Never use words like emergency, danger, disaster, fire, flood, accident, crash, toxic, or any frightening term. Instead use soft equivalents:
+- Traffic accident / road closure → "There is some activity on the road nearby."
+- Flood / storm → "The weather outside is a little unsettled today."
+- Fire → "There is some smoke in the area nearby."
+- Earthquake → "There was a small shake outside just now."
+- Extreme heat → "It is very warm outside today."
+- Chemical spill → "There is something in the air outside right now."
+- Adjust vocabulary complexity based on cognition:
+  - CDR 3 (severe dementia): use the simplest possible words, one clause only. E.g. "Outside is a little busy right now."
+  - CDR 2 (moderate dementia): short and concrete. E.g. "The road nearby has some traffic today."
+  - CDR 0.5–1 (mild impairment): simple but can include a little more context.
+  - CDR 0 (no impairment): one clear, calm sentence describing the situation honestly but gently.
+- Adjust tone based on psychological status:
+  - Severe anxiety / panic disorder: lead with "Everything is fine." before describing anything.
+  - PTSD: avoid any reference to the event itself. Go directly to "Someone you love is coming."
+  - Depression: use warm language. E.g. "Your [helper] is thinking of you today."
+  - Mild anxiety / no concerns: normal neutral framing.
+
 STEP 1 — MOBILITY + DISASTER TYPE determines the core instruction:
 - Fully bedridden (EMS 0-4) AND disaster allows staying in place (earthquake, typhoon, high-floor flood): tell them to stay exactly where they are. Mention ${persona.helpers.strongTie} has been notified and is coming.
 - Fully bedridden (EMS 0-4) AND disaster requires leaving (fire, chemical spill, rising floodwater, tsunami): tell them a caregiver is coming right now to carry them — frame it as being looked after, not an emergency. Mention ${persona.helpers.strongTie} is on the way.
@@ -1218,7 +1236,7 @@ TONE RULES:
 Elder profile:
 - Name: ${persona.name}
 - Age: ${persona.age}
-- Conditions: ${persona.cognition}, ${persona.mobility}, ${persona.sensory}, ${persona.psychological}
+- Conditions: ${persona.tags.map(t=>t[0]).join(', ')}
 - Mobility: ${persona.mobility}
 - Primary language: ${persona.language}
 - Home: ${persona.location}
@@ -1255,7 +1273,7 @@ function blobToBase64(blob) {
   });
 }
 
-const PI_URL = 'http://192.168.1.124:5001';
+const PI_URL = 'http://localhost:5001'; // change to Pi IP when ready
 
 async function generateAudio(text) {
   try {
@@ -1294,4 +1312,5 @@ init();
 </script>
 </body>
 </html>
+
 
