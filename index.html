@@ -1854,13 +1854,17 @@ async function generateAudio(text) {
       player.play().catch(() => {});
     };
 
-    // Pi broadcast
-    const base64 = await blobToBase64(blob);
-    await fetch(`${PI_URL}/play`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio: base64 })
-    }).catch(() => {});
+    // Pi broadcast (non-blocking)
+    blobToBase64(blob).then(base64 => {
+      fetch(`${PI_URL}/play`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': '1'
+        },
+        body: JSON.stringify({ audio: base64 })
+      }).catch(() => {});
+    });
 
   } catch (e) {
     speakText(text);
