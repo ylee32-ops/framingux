@@ -13,7 +13,8 @@
     color: #111111;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -26,7 +27,7 @@
   }
 
   .sidebar {
-    width: 48px;
+    width: 56px;
     background: #1a1a1a;
     display: flex;
     flex-direction: column;
@@ -35,11 +36,14 @@
     gap: 4px;
     flex-shrink: 0;
     border-right: 1px solid #333;
+    overflow: visible;
+    position: relative;
+    z-index: 100;
   }
 
   .sidebar-tab {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,7 +59,7 @@
 
   .sidebar-tab .tab-tooltip {
     position: absolute;
-    left: 52px;
+    left: 56px;
     background: #111;
     color: #fff;
     font-size: 10px;
@@ -67,6 +71,7 @@
     transition: opacity 0.15s;
     letter-spacing: 1px;
     text-transform: uppercase;
+    z-index: 200;
   }
 
   .sidebar-tab:hover .tab-tooltip { opacity: 1; }
@@ -151,9 +156,9 @@
     color: #fff;
     text-align: center;
     padding: 10px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     z-index: 200;
     transform: translateY(-100%);
@@ -164,6 +169,9 @@
 
   .main-grid {
     display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
   }
   .col {
     flex: 1;
@@ -171,14 +179,16 @@
     overflow: auto;
   }
 
-  .col { border-right: 1px solid #ddd; display: flex; flex-direction: column; overflow: hidden; }
+  .col { border-right: 1px solid #ddd; display: flex; flex-direction: column; overflow: hidden; height: 100%; }
   .col:last-child { border-right: none; }
 
   .col-header {
-    padding: 14px 24px;
-    border-bottom: 1px solid #ddd;
-    font-size: 11px;
-    font-weight: 600;
+    height: 52px;
+    flex-shrink: 0;
+    padding: 0 24px;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #111;
@@ -189,7 +199,7 @@
   }
 
   .col-header.red { color: #cc0000; border-bottom-color: #cc0000; background: #fff5f5; }
-  .col-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .col-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; font-size: 12px; overflow: hidden; }
 
   select {
     width: 100%;
@@ -220,42 +230,147 @@
   }
 
   .box-label {
-    font-size: 9px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #cc0000;
+    color: #999;
     margin-bottom: 8px;
     display: block;
   }
 
-  .alert-btn {
-    width: 100%;
-    padding: 12px;
-    background: #cc0000;
-    border: none;
-    color: #fff;
+  /* ═══════════════════════════════════════════════════════════
+   * BUTTON SYSTEM
+   *
+   * Variants
+   *   .btn-primary     Solid red   — ONE dominant action per zone
+   *   .btn-secondary   Outlined red — supporting action
+   *   .btn-ghost       Text-only    — low-prominence (Clear, Cancel)
+   *   .btn-neutral     Outlined gray — utility / table actions
+   *   .btn-blue        Outlined blue — helper / GPS actions
+   *   .btn-toggle      Neutral toggle — show/hide (off = outlined gray, on = filled red)
+   *   .btn-toggle-blue Blue toggle   — show/hide (off = outlined blue, on = filled blue)
+   *
+   * Sizes
+   *   (default)  padding 10px 20px  font 11px — standalone
+   *   .btn-sm    padding  5px 12px  font 10px — headers / toolbars
+   *   .btn-lg    padding 13px 20px  font 12px — full-width important
+   *
+   * Modifiers
+   *   .btn-full   width 100%
+   *   .is-on      active state for toggle variants
+   * ═══════════════════════════════════════════════════════════ */
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap; line-height: 1;
   }
 
-  .alert-btn:hover { background: #aa0000; }
-  .alert-btn:active { background: #880000; }
-  .alert-btn:disabled { background: #ccc; cursor: not-allowed; }
+  /* Primary — solid red */
+  .btn-primary { background: #cc0000; color: #fff; border-color: #cc0000; }
+  .btn-primary:hover:not(:disabled) { background: #B71C1C; border-color: #B71C1C; }
+  .btn-primary:active:not(:disabled) { background: #961515; border-color: #961515; }
+  .btn-primary:disabled { background: #E0E0E0; border-color: #E0E0E0; color: #9E9E9E; cursor: not-allowed; }
+
+  /* Secondary — outlined red */
+  .btn-secondary { background: transparent; color: #cc0000; border-color: #cc0000; }
+  .btn-secondary:hover:not(:disabled) { background: #cc0000; color: #fff; }
+  .btn-secondary:active:not(:disabled) { background: #B71C1C; color: #fff; border-color: #B71C1C; }
+  .btn-secondary:disabled { border-color: #BDBDBD; color: #BDBDBD; cursor: not-allowed; background: transparent; }
+
+  /* Ghost — text only */
+  .btn-ghost { background: transparent; color: #cc0000; border-color: transparent; padding-left: 0; padding-right: 0; }
+  .btn-ghost:hover:not(:disabled) { color: #B71C1C; }
+  .btn-ghost:active:not(:disabled) { color: #961515; }
+  .btn-ghost:disabled { color: #BDBDBD; cursor: not-allowed; }
+
+  /* Neutral — outlined gray */
+  .btn-neutral { background: transparent; color: #555; border-color: #BDBDBD; }
+  .btn-neutral:hover:not(:disabled) { border-color: #424242; color: #212121; }
+  .btn-neutral:active:not(:disabled) { background: #F5F5F5; }
+  .btn-neutral:disabled { color: #BDBDBD; border-color: #E0E0E0; cursor: not-allowed; }
+
+  /* Blue — helper / GPS */
+  .btn-blue { background: transparent; color: #1565C0; border-color: #1565C0; }
+  .btn-blue:hover:not(:disabled) { background: #1565C0; color: #fff; }
+  .btn-blue:active:not(:disabled) { background: #0D47A1; color: #fff; border-color: #0D47A1; }
+  .btn-blue:disabled { border-color: #BBDEFB; color: #90CAF9; cursor: not-allowed; }
+  .btn-blue.notified { border-color: #2E7D32; color: #2E7D32; background: rgba(46,125,50,0.06); cursor: default; }
+  .btn-blue.notified:hover { background: rgba(46,125,50,0.06); color: #2E7D32; }
+
+  /* Toggle — neutral (off=gray, on=red filled) */
+  .btn-toggle { background: transparent; color: #555; border-color: #BDBDBD; }
+  .btn-toggle:hover:not(.is-on) { border-color: #424242; color: #212121; }
+  .btn-toggle.is-on { background: #cc0000; color: #fff; border-color: #cc0000; }
+  .btn-toggle.is-on:hover { background: #B71C1C; border-color: #B71C1C; }
+
+  /* Toggle — blue (off=blue outline, on=blue filled) */
+  .btn-toggle-blue { background: transparent; color: #1565C0; border-color: #1565C0; }
+  .btn-toggle-blue:hover:not(.is-on) { background: rgba(21,101,192,0.06); }
+  .btn-toggle-blue.is-on { background: #1565C0; color: #fff; border-color: #1565C0; }
+  .btn-toggle-blue.is-on:hover { background: #0D47A1; border-color: #0D47A1; }
+
+  /* Sizes */
+  .btn-sm { padding: 5px 12px; font-size: 10px; letter-spacing: 1.5px; }
+  .btn-lg { padding: 13px 20px; font-size: 12px; letter-spacing: 1px; }
+
+  /* Full width */
+  .btn-full { width: 100%; }
+
+  /* ── Icon-only buttons ──────────────────────────────────────
+   * .btn-icon-solid  — filled background (primary action, e.g. Notify All)
+   * .btn-icon-outline — bordered, transparent (secondary, e.g. single Notify)
+   * .is-notified     — success/done state for both
+   */
+  .btn-icon { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; padding:0; border-radius:2px; cursor:pointer; transition:background 0.15s, border-color 0.15s, color 0.15s; flex-shrink:0; font-family:inherit; }
+  .btn-icon-solid { background:#1565C0; color:#fff; border:1px solid #1565C0; }
+  .btn-icon-solid:hover:not(:disabled) { background:#0D47A1; border-color:#0D47A1; }
+  .btn-icon-solid.is-notified { background:#2E7D32; border-color:#2E7D32; cursor:default; }
+  .btn-icon-outline { background:transparent; color:#1565C0; border:1px solid #1565C0; }
+  .btn-icon-outline:hover:not(:disabled) { background:rgba(21,101,192,0.06); }
+  .btn-icon-outline.is-notified { background:#2E7D32; border-color:#2E7D32; color:#fff; cursor:default; }
+
+  /* ── Toggle switch ──────────────────────────────────────────
+   * Usage: <label class="toggle-switch">
+   *          <input type="checkbox" onchange="fn()">
+   *          <span class="toggle-track"></span>
+   *          <span class="toggle-label">Label</span>
+   *        </label>
+   */
+  .toggle-switch { display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+  .toggle-switch input { position:absolute; opacity:0; width:0; height:0; }
+  .toggle-track {
+    position:relative; width:32px; height:18px; border-radius:9px;
+    background:#BDBDBD; transition:background 0.2s;
+    flex-shrink:0;
+  }
+  .toggle-track::after {
+    content:''; position:absolute;
+    top:3px; left:3px;
+    width:12px; height:12px; border-radius:50%;
+    background:#fff; transition:transform 0.2s, background 0.2s;
+    box-shadow:0 1px 2px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked + .toggle-track { background:#cc0000; }
+  .toggle-switch input:checked + .toggle-track::after { transform:translateX(14px); }
+  .toggle-switch--blue input:checked + .toggle-track { background:#1565C0; }
+  .toggle-label { font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:#555; }
 
   .persona-card { padding: 16px; }
   .persona-name { font-size: 16px; font-weight: 600; color: #111; margin-bottom: 2px; }
   .persona-sub { font-size: 11px; color: #888; margin-bottom: 12px; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
-  .tag { padding: 3px 8px; font-size: 10px; border: 1px solid; text-transform: uppercase; letter-spacing: 0.5px; }
-  .tag-red { color: #cc0000; border-color: #cc0000; }
-  .tag-black { color: #111; border-color: #111; }
-  .tag-gray { color: #555; border-color: #999; }
+  .tag { padding: 3px 8px; font-size: 11px; border: none; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tag-red { color: #cc0000; background: rgba(204, 0, 0, 0.07); }
+  .tag-black { color: #111; background: rgba(0, 0, 0, 0.06); }
+  .tag-gray { color: #666; background: rgba(0, 0, 0, 0.04); }
 
   .persona-note { font-size: 11px; color: #444; line-height: 1.8; border-top: 1px solid #ddd; padding-top: 12px; }
   .persona-note .warn { color: #cc0000; }
@@ -266,21 +381,22 @@
     padding: 16px;
     min-height: 90px;
     font-size: 13px;
-    line-height: 2;
+    line-height: 1.8;
     color: #111;
   }
 
   .script-box.loading { color: #aaa; }
 
-  .radio-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 12px; }
+  .radio-wrap { display: flex; flex-direction: column; padding: 8px 0; gap: 12px; }
 
   .radio-body {
-    width: 240px;
+    width: 100%;
     background: #f5f5f5;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 14px;
     transition: all 0.4s;
+    box-sizing: border-box;
   }
 
   .radio-body.active { border-color: #cc0000; box-shadow: 0 0 0 2px rgba(204,0,0,0.15); }
@@ -289,7 +405,7 @@
   .radio-body.active .radio-brand { color: #cc0000; }
 
   .grille { background: #ddd; border: 1px solid #bbb; border-radius: 2px; padding: 8px; margin-bottom: 10px; }
-  .grille-dots { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; }
+  .grille-dots { display: grid; grid-template-columns: repeat(auto-fill, minmax(8px, 1fr)); gap: 3px; }
 
   .grille-dot { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #bbb; transition: background 0.2s; }
   .radio-body.active .grille-dot { animation: dot-wave 0.4s infinite alternate; }
@@ -297,6 +413,23 @@
   .radio-body.active .grille-dot:nth-child(3n) { animation-delay: 0.3s; }
 
   @keyframes dot-wave { from { background: #ccc; } to { background: #cc0000; } }
+
+  .pulse-marker-icon { background: none !important; border: none !important; }
+  .pulse-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid #cc0000;
+    animation: pulse-expand 1.8s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pulse-expand {
+    0%   { width: 18px;  height: 18px;  opacity: 0.7; }
+    100% { width: 62px;  height: 62px;  opacity: 0;   }
+  }
+
 
   .radio-display {
     background: #fff;
@@ -331,7 +464,7 @@
   .radio-body.active .power-led { background: #cc0000; }
 
   .status-table { width: 100%; border-collapse: collapse; }
-  .status-table td { padding: 6px 0; font-size: 11px; border-bottom: 1px solid #f0f0f0; }
+  .status-table td { padding: 6px 0; font-size: 12px; border-bottom: 1px solid #f0f0f0; }
   .status-table td:first-child { color: #888; text-transform: uppercase; letter-spacing: 1px; }
   .status-table td:last-child { text-align: right; font-weight: 600; }
   .active-val { color: #cc0000; }
@@ -371,24 +504,94 @@
 
   .history-empty { font-size: 11px; color: #aaa; }
 
+  .history-filter-bar {
+    display: flex; gap: 8px; padding: 12px 24px;
+    border-bottom: 1px solid #eee; flex-shrink: 0; background: #fff;
+  }
+  .history-filter-input {
+    flex: 1; border: 1px solid #ddd; padding: 6px 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #111;
+    outline: none; background: #fff; min-width: 0;
+  }
+  .history-filter-input:focus { border-color: #111; }
+  .history-filter-input::placeholder { color: #bbb; }
+
   .history-list { display: flex; flex-direction: column; gap: 10px; }
 
   .history-item {
     border: 1px solid #ddd;
     border-left: 3px solid #111;
     padding: 12px 14px;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.8;
   }
 
-  .history-meta { color: #888; margin-bottom: 4px; }
+  .history-meta { color: #888; margin-bottom: 4px; font-size: 11px; }
+  .history-meta strong { color: #111; font-weight: 600; }
+  .history-disaster { font-size: 11px; color: #555; margin-bottom: 6px; }
   .history-script { color: #333; }
 
   @media (max-width: 860px) {
     .main-grid { grid-template-columns: 1fr; }
     .pipeline { display: none; }
   }
+
+  /* ── Design tokens ────────────────────────── */
+  /*
+   * Type scale  (IBM Plex Mono, all sizes)
+   *   mp-title    15px / 700   — resident name
+   *   mp-label    10px / 600 uppercase 1.5px  — section headers
+   *   mp-name     12px / 600   — helper name, contact name
+   *   mp-role     10px / 500 uppercase 0.8px  — helper role badge
+   *   mp-body     11px / 400 lh 1.65  — note, description
+   *   mp-meta     11px / 400   — phone, location, distance
+   *
+   * Color roles  (Material Design–aligned, WCAG AA compliant on white)
+   *
+   *   #111111  Primary      titles, key values, names          (contrast 18:1)
+   *   #333333  Secondary    labels (AGE/LANGUAGE), descriptions (contrast 12:1)
+   *   #555555  Tertiary     field values, registry data         (contrast 7:1)
+   *   #777777  Muted        phone, metadata, supporting text    (contrast 4.5:1 ✓)
+   *   #999999  Subtle       hints, source, timestamps           (decorative only)
+   *
+   *   #CC0000  Brand/Alert  primary action, alert state
+   *   #1565C0  Helper-blue  (M3 Blue 800) helpers / GPS
+   *   #2E7D32  Success      (M3 Green 800) notified state
+   *
+   * Spacing  4px grid: 4 8 12 16 20 24
+   */
+
+  /* ── Map page ─────────────────────────────── */
+  #mapContainer { flex: 1; min-height: 0; }
+  .leaflet-container { height: 100% !important; width: 100% !important; font-family: 'IBM Plex Mono', monospace; }
+  .map-tooltip.leaflet-tooltip { font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border: none; background: rgba(33,33,33,0.85); color: #fff; border-radius: 2px; box-shadow: none; }
+  .map-tooltip.leaflet-tooltip::before { display: none; }
+  .map-tab-badge { position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; background: #FF3B30; border-radius: 50%; border: 2px solid #1a1a1a; display: none; box-shadow: 0 0 0 1px rgba(255,59,48,0.4); }
+
+  /* ── Map side panel — type scale ─────────── */
+  .mp-title   { font-size: 15px; font-weight: 700; color: #111111; letter-spacing: 0; line-height: 1.3; }
+  .mp-label   { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #555555; }
+  .mp-label--blue { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #1565C0; }
+  .mp-name    { font-size: 12px; font-weight: 600; color: #111111; }
+  .mp-role    { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; color: #555555; margin-top: 1px; }
+  .mp-body    { font-size: 11px; font-weight: 400; color: #444444; line-height: 1.65; }
+  .mp-meta    { font-size: 11px; font-weight: 400; color: #777777; }
+  .mp-divider { height: 1px; background: #E0E0E0; margin: 16px 0; }
+
+  /* ── Status chips ─────────────────────────── */
+  .mp-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .mp-chip--alert { background: rgba(198,40,40,0.08); color: #C62828; }
+  .mp-chip--live  { background: rgba(21,101,192,0.08); color: #1565C0; }
+
+  /* ── Helper cards ─────────────────────────── */
+  .helper-card { background:#F9F9F9; border:1px solid #E0E0E0; padding:14px 16px; margin-bottom:8px; }
+  .helper-card:last-child { margin-bottom:0; }
+  .helper-card.is-notified { background:#F1F8F2; border-color:#C8E6C9; }
+  .helper-dist { font-size: 11px; font-weight: 500; color: #555555; }
+
+  /* ── Notify button ────────────────────────── */
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
 
@@ -397,14 +600,7 @@
 <header class="header">
   <div class="header-left">
     <div class="status-dot" id="statusDot"></div>
-    <svg width="74" height="21" style="display:block;" viewBox="0 0 297 85" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0.00761634 83.3724C-0.0104565 83.2548 0.00574655 83.1351 0.0268786 83.018L14.9142 0.481587C14.9944 0.160529 15.1949 0 15.5158 0H32.9615C33.2823 0 33.4829 0.160529 33.5631 0.481587L47.8806 83.1941C47.9608 83.5954 47.8004 83.796 47.3993 83.796H34.0443C33.7235 83.796 33.523 83.5954 33.4427 83.1941L29.713 61.5227H18.1627L14.4329 83.1941C14.3527 83.5954 14.1522 83.796 13.8314 83.796H0.476378C0.207243 83.796 0.0509894 83.6548 0.00761634 83.3724ZM18.1627 61.5227H29.713L24.7801 27.6912C24.6673 26.9956 23.6526 26.9906 23.5769 27.6912L18.1627 61.5227Z" fill="#cc0000"/>
-<path d="M61.7055 83.796C61.3847 83.796 61.2243 83.5954 61.2243 83.1941V16.568C61.2243 15.4634 60.3289 14.568 59.2243 14.568H45.5833C45.1823 14.568 44.9817 14.3673 44.9817 13.966L45.102 0.481587C45.102 0.160529 45.2625 0 45.5833 0H93.7564C94.1574 0 94.3656 0 93.2751 0.481587L93.1548 13.966C94.2453 14.5 94.0772 14.568 93.7564 14.568H77.6656C76.5597 14.568 75.6637 15.4656 75.6656 16.5715L75.7824 83.1941C75.7824 83.5954 75.622 83.796 75.3012 83.796H61.7055Z" fill="#ffffff"/>
-<path d="M109.879 83.796C109.558 83.796 109.397 83.5954 109.397 83.1941V16.568C109.397 15.4634 108.502 14.568 107.397 14.568H93.7564C93.3553 14.568 93.1548 14.3673 93.1548 13.966L93.2751 0.481587C93.2751 0.160529 93.4355 0 93.7564 0H139.476C139.877 0 140.078 0.160529 140.078 0.481587V13.966C140.078 14.3673 139.917 14.568 139.596 14.568H125.839C124.733 14.568 123.837 15.4656 123.839 16.5715L123.956 83.1941C123.956 83.5954 123.795 83.796 123.474 83.796H109.879Z" fill="#ffffff"/>
-<path d="M168.158 85C163.907 85 159.977 83.9164 156.367 81.7493C152.758 79.5019 149.87 76.5321 147.705 72.8399C145.619 69.1478 144.576 65.0944 144.576 60.6799L144.817 0.481587C144.817 0.160529 144.977 0 145.298 0H158.774C159.094 0 159.255 0.160529 159.255 0.481587V60.6799C159.255 63.4089 160.097 65.7365 161.781 67.6629C163.546 69.509 165.672 70.432 168.158 70.432C170.725 70.432 172.85 69.509 174.535 67.6629C176.3 65.7365 177.182 63.4089 177.182 60.6799V0.481587C177.182 0.160529 177.342 0 177.663 0H191.138C191.459 0 191.62 0.160529 191.62 0.481587L191.86 60.6799C191.86 65.1747 190.777 69.2682 188.612 72.9603C186.526 76.6525 183.679 79.5822 180.069 81.7493C176.54 83.9164 172.57 85 168.158 85Z" fill="#ffffff"/>
-<path d="M202.443 83.796C201.802 83.796 201.481 83.5151 201.481 82.9533L201.361 0.963175C201.361 0.321058 201.681 0 202.323 0H211.833C212.633 0 213.356 0.476741 213.671 1.21205L229.516 38.1781C230.379 40.1903 233.383 39.5533 233.354 37.3643L232.883 0.963175C232.883 0.321058 233.244 0 233.966 0H245.877C246.358 0 246.599 0.321058 246.599 0.963175L246.719 83.0737C246.719 83.5552 246.519 83.796 246.118 83.796H236.8C236.025 83.796 235.32 83.3481 234.99 82.6464L218.708 47.9879C217.79 46.0343 214.856 46.7192 214.898 48.8772L215.558 82.8329C215.558 83.475 215.197 83.796 214.475 83.796H202.443Z" fill="#ffffff"/>
-<path d="M257.652 83.796C257.331 83.796 257.171 83.5954 257.171 83.1941L257.291 0.481587C257.291 0.160529 257.451 0 257.772 0H296.394C296.714 0 296.875 0.200661 296.875 0.601982V14.0864C296.875 14.4075 296.714 14.568 296.394 14.568H273.729C272.624 14.568 271.729 15.4634 271.729 16.568V31.3499C271.729 32.4544 272.624 33.3499 273.729 33.3499H296.394C296.714 33.3499 296.875 33.5104 296.875 33.8314L296.995 47.4363C296.995 47.7573 296.835 47.9179 296.514 47.9179H273.729C272.624 47.9179 271.729 48.8133 271.729 49.9179V66.9873C271.729 68.0918 272.624 68.9873 273.729 68.9873H296.514C296.835 68.9873 296.995 69.1879 296.995 69.5892V83.3145C296.995 83.6355 296.835 83.796 296.514 83.796H257.652Z" fill="#ffffff"/>
-</svg>
+    <span style="font-family:'Arial Black', Arial, sans-serif;font-weight:900;font-size:20px;letter-spacing:1px;color:#fff;">ATTUNE</span>
   </div>
   <div class="header-time">
     <span class="time-value" id="clockDisplay">--:--:--</span>
@@ -419,148 +615,217 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span class="tab-tooltip">Alert Console</span>
   </div>
+  <div class="sidebar-tab" onclick="switchTab('map')" id="tab-map">
+    <div class="map-tab-badge" id="mapTabBadge"></div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+    <span class="tab-tooltip">Map View</span>
+  </div>
   <div class="sidebar-tab" onclick="switchTab('registry')" id="tab-registry">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     <span class="tab-tooltip">Residents Registry</span>
+  </div>
+  <div class="sidebar-tab" onclick="switchTab('history')" id="tab-history">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="tab-tooltip">Alert History</span>
   </div>
 </nav>
 
 <div class="page-content">
 
-<div class="page active" id="page-alert">
+<div class="page active" id="page-alert" style="flex:1;overflow:hidden;">
 <div class="main-grid">
 
-  <div class="col">
+  <!-- COL 1: Official Alert -->
+  <div class="col" style="display:flex;flex-direction:column;min-width:280px;max-width:320px;">
     <div class="col-header red">Official Alert</div>
-    <div class="col-body">
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+    <div style="flex:1;display:flex;flex-direction:column;padding:20px;overflow:hidden;min-height:0;">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <button onclick="loadLiveAlert()" id="loadAlertBtn" style="background:none;border:1px solid #cc0000;color:#cc0000;padding:6px 12px;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">↓ Load Recent NYC Alert</button>
-          <span id="loadAlertStatus" style="font-size:10px;color:#888;"></span>
+          <button onclick="loadLiveAlert()" id="loadAlertBtn" class="btn btn-secondary btn-sm">↓ Load Live Alert</button>
+          <span id="loadAlertStatus" style="font-size:11px;color:#777777;"></span>
         </div>
-        <select id="alertSelect" onchange="selectAlert(this)" style="display:none;border:1px solid #bbb;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;color:#111;">
-          <option value="">— Select an alert —</option>
-        </select>
+        <div style="font-size:11px;color:#999999;">Source: NYC Emergency Management Open Data</div>
+        <!-- Custom alert dropdown -->
+        <div id="alertDropdownWrap" style="display:none;position:relative;width:100%;">
+          <button id="alertDropdownBtn" onclick="toggleAlertDropdown()" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #bbb;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;cursor:pointer;text-align:left;transition:border-color 0.15s;" onmouseenter="this.style.borderColor='#888'" onmouseleave="this.style.borderColor='#bbb'">
+            <span id="alertDropdownLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">— Select an alert —</span>
+            <svg id="alertDropdownChevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="alertDropdownList" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #bbb;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:999;max-height:260px;overflow-y:auto;"></div>
+        </div>
       </div>
-      <textarea id="alertInput" rows="8" style="width:100%;border:1px solid #bbb;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.8;color:#444;resize:vertical;border-left:3px solid #cc0000;background:#fff;outline:none;margin-bottom:16px;" placeholder="Paste any official disaster warning text here..."></textarea>
-      <button class="alert-btn" id="alertBtn" onclick="processAlert()">Process Alert</button>
+      <textarea id="alertInput" style="width:100%;flex:1;min-height:120px;border:1px solid #bbb;padding:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.8;color:#444;resize:none;border-left:3px solid #cc0000;background:#fff;outline:none;margin-bottom:16px;" placeholder="Paste any official disaster warning text here..."></textarea>
+      <button class="btn btn-secondary btn-full btn-lg" id="alertBtn" onclick="processAlert()">Process Alert</button>
     </div>
   </div>
 
-  <div class="col" style="flex:2;display:flex;flex-direction:column;min-width:400px;">
-    <div class="col-header">Residents Registry</div>
-    <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
-      <div style="width:220px;flex-shrink:0;border-right:1px solid #ddd;display:flex;flex-direction:column;">
-        <div style="padding:12px 16px;border-bottom:1px solid #ddd;background:#fff;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-          <div id="registryStatus" style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:1px;">Awaiting alert</div>
-        </div>
-        <div id="residentList" style="overflow-y:auto;max-height:calc(15 * 57px);"></div>
+  <!-- COL 2: Residents List only -->
+  <div class="col" style="min-width:200px;max-width:240px;display:flex;flex-direction:column;">
+    <div class="col-header">
+      Residents
+      <span id="registryStatus" style="display:none;background:#cc0000;color:#fff;font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 7px;border-radius:10px;line-height:1.4;"></span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;">
+      <div id="residentList" style="overflow-y:auto;flex:1;"></div>
+    </div>
+  </div>
+
+  <!-- COL 3: Selected person panel -->
+  <div class="col" style="flex:2;display:flex;flex-direction:column;min-width:0;">
+    <div class="col-header" style="justify-content:space-between;">
+      <span id="personPanelHeader">Resident Detail</span>
+      <div id="broadcastBtnWrap" style="display:none;">
+        <button id="broadcastBtn" onclick="broadcastToResident()" class="btn btn-primary btn-sm">Broadcast</button>
       </div>
-      <div style="flex:1;overflow-y:auto;">
+    </div>
+    <div style="flex:1;display:flex;overflow:hidden;min-height:0;">
+
+      <!-- Left: persona detail -->
+      <div style="flex:1;overflow-y:auto;border-right:1px solid #eee;">
         <div class="col-body" style="padding-top:16px;">
-      <select id="personaSelect" onchange="updatePersona()" style="display:none;">
-        <option value="0">Carmen — Age 78 / Spanish (Bronx)</option>
-        <option value="1">Wei — Age 82 / Cantonese (Manhattan)</option>
-        <option value="2">Irina — Age 75 / Russian (Brooklyn)</option>
-        <option value="3">Paige — Age 91 / English (Staten Island)</option>
-        <option value="4">Rosa — Age 84 / Spanish (Manhattan)</option>
-        <option value="5">James — Age 79 / English (Brooklyn)</option>
-        <option value="6">Lily — Age 86 / Mandarin Traditional (Queens)</option>
-        <option value="7">Yusuf — Age 73 / Bengali (Queens)</option>
-        <option value="8">Grace — Age 88 / Haitian Creole (Brooklyn)</option>
-        <option value="9">Sun-Hee — Age 77 / Korean (Queens)</option>
-        <option value="10">Antonio — Age 80 / Spanish (Bronx)</option>
-        <option value="11">Natasha — Age 83 / Russian (Brooklyn)</option>
-        <option value="12">Dorothy — Age 92 / English (Manhattan)</option>
-        <option value="13">Pham — Age 76 / Vietnamese (Brooklyn)</option>
-        <option value="14">Maria — Age 85 / Spanish (Queens)</option>
-        <option value="15">Enzo — Age 81 / Italian (Brooklyn)</option>
-        <option value="16">Aisha — Age 74 / French (Manhattan)</option>
-        <option value="17">Hyun — Age 89 / Korean (Queens)</option>
-        <option value="18">Mei — Age 80 / Mandarin Simplified (Queens)</option>
-        <option value="19">Ruth — Age 87 / English (Staten Island)</option>
-      </select>
-      <div class="persona-card" id="personaCard"></div>
-      <div id="broadcastBtnWrap" style="display:none;padding:0 16px 16px;">
-        <button class="alert-btn" id="broadcastBtn" onclick="broadcastToResident()" style="background:#111;">Broadcast</button>
-      </div>
+          <select id="personaSelect" onchange="updatePersona()" style="display:none;"></select>
+          <div class="persona-card" id="personaCard"></div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="col">
-    <div class="col-header">Audio Output</div>
-    <div class="col-body">
-      <div>
-        <span class="box-label">// Processing Log</span>
-        <div id="processingLog" style="font-size:11px;color:#888;line-height:2;margin-bottom:12px;min-height:60px;font-family:'IBM Plex Mono',monospace;"></div>
-      </div>
-      <div>
-        <span class="box-label">// AI Translated Broadcast Script</span>
-        <div class="script-box" id="scriptText">Awaiting alert...</div>
-      </div>
+      <!-- Right: broadcast panel -->
+      <div style="width:340px;flex-shrink:0;display:flex;flex-direction:column;background:#fafafa;">
 
-      <div class="radio-wrap">
-        <span class="box-label" style="align-self:flex-start">// Simulated Bedside Speaker</span>
-        <div class="radio-body" id="radioBody">
-          <div class="radio-brand">Guardian · Emergency</div>
-          <div class="grille"><div class="grille-dots" id="grilleDots"></div></div>
-          <div class="radio-display">
-            <span class="freq" id="freqDisplay">--- FM</span>
-            <div class="signal-bars">
-              <div class="signal-bar"></div><div class="signal-bar"></div>
-              <div class="signal-bar"></div><div class="signal-bar"></div>
-              <div class="signal-bar"></div>
+        <!-- TOP: scrollable log only -->
+        <div style="flex:1;overflow-y:auto;min-height:0;padding:20px 20px 0;">
+          <span class="box-label">Processing log</span>
+          <div id="processingLog" style="font-size:12px;color:#555555;line-height:2;min-height:48px;font-family:'IBM Plex Mono',monospace;padding-bottom:16px;"></div>
+        </div>
+
+        <!-- BOTTOM: fixed script + radio + status -->
+        <div style="flex-shrink:0;border-top:2px solid #eee;background:#fafafa;">
+          <div style="padding:14px 20px;border-bottom:1px solid #eee;">
+            <span class="box-label">Broadcast script</span>
+            <div class="script-box" id="scriptText" style="margin-top:8px;">Awaiting broadcast...</div>
+          </div>
+          <div style="padding:16px 20px;border-bottom:1px solid #eee;">
+            <span class="box-label">Simulated bedside speaker</span>
+            <div class="radio-wrap" style="padding:0;margin-top:8px;">
+              <div class="radio-body" id="radioBody">
+                <div class="grille"><div class="grille-dots" id="grilleDots"></div></div>
+                <div class="radio-display">
+                  <span class="freq" id="freqDisplay">--- FM</span>
+                  <div class="signal-bars">
+                    <div class="signal-bar"></div><div class="signal-bar"></div>
+                    <div class="signal-bar"></div><div class="signal-bar"></div>
+                    <div class="signal-bar"></div>
+                  </div>
+                </div>
+                <div class="knobs">
+                  <div class="knob-group"><div class="knob"></div><span class="knob-label">Vol</span></div>
+                  <div class="power-led"></div>
+                  <div class="knob-group"><div class="knob"></div><span class="knob-label">Tune</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="audio-wrap" id="audioWrapper" style="margin-top:12px;">
+              <audio id="audioPlayer" controls></audio>
             </div>
           </div>
-          <div class="knobs">
-            <div class="knob-group"><div class="knob"></div><span class="knob-label">Vol</span></div>
-            <div class="power-led"></div>
-            <div class="knob-group"><div class="knob"></div><span class="knob-label">Tune</span></div>
+          <div style="padding:14px 20px;">
+            <span class="box-label">Broadcast status</span>
+            <table class="status-table">
+              <tr><td>Status</td><td id="broadcastStatus">Standby</td></tr>
+              <tr><td>Last push</td><td id="lastPush">—</td></tr>
+              <tr><td>Persona match</td><td id="personaMatch">—</td></tr>
+            </table>
           </div>
         </div>
+
       </div>
 
-      <div class="audio-wrap" id="audioWrapper">
-        <audio id="audioPlayer" controls></audio>
-      </div>
-
-      <table class="status-table">
-        <tr><td>Broadcast Status</td><td id="broadcastStatus">Standby</td></tr>
-        <tr><td>Last Push</td><td id="lastPush">—</td></tr>
-        <tr><td>Persona Match</td><td id="personaMatch">—</td></tr>
-      </table>
     </div>
   </div>
-
-</div>
-
-<!-- ALERT HISTORY -->
-<div class="history-section">
-  <div class="history-title">
-    Alert History
-    <button class="history-clear" onclick="clearHistory()">Clear</button>
-  </div>
-  <div id="historyList"><span class="history-empty">No alerts issued yet. History persists across page refreshes.</span></div>
-</div>
 
 </div><!-- end main-grid -->
 </div><!-- end page-alert -->
 
+<div class="page" id="page-history">
+  <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="col-header" style="justify-content:space-between;">
+      <span>Alert History</span>
+      <button onclick="clearHistory()" class="btn btn-ghost btn-sm">Clear</button>
+    </div>
+    <!-- Filter bar -->
+    <div class="history-filter-bar">
+      <input class="history-filter-input" id="hf-name"     oninput="renderHistory()" placeholder="Name">
+      <input class="history-filter-input" id="hf-location" oninput="renderHistory()" placeholder="Location">
+      <input class="history-filter-input" id="hf-disaster" oninput="renderHistory()" placeholder="Disaster">
+      <input class="history-filter-input" id="hf-time"     oninput="renderHistory()" placeholder="Time">
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:24px;">
+      <div id="historyList"><span class="history-empty">No alerts issued yet.</span></div>
+    </div>
+  </div>
+</div><!-- end page-history -->
+
 <div class="page" id="page-registry">
   <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
     <!-- Registry Header -->
-    <div style="padding:14px 24px;border-bottom:1px solid #ddd;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-      <span style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#111;">Residents Registry</span>
-      <button onclick="openModal()" style="background:#cc0000;color:#fff;border:none;padding:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">+ Add Resident</button>
+    <div class="col-header" style="justify-content:space-between;">
+      <span>Residents Registry</span>
+      <button onclick="openModal()" class="btn btn-primary btn-sm">+ Add Resident</button>
+    </div>
+    <!-- Filter bar (same style as history page) -->
+    <div class="history-filter-bar">
+      <input class="history-filter-input" id="rf-name"     oninput="renderRegistryTable()" placeholder="Name">
+      <input class="history-filter-input" id="rf-location" oninput="renderRegistryTable()" placeholder="Location">
+      <input class="history-filter-input" id="rf-language" oninput="renderRegistryTable()" placeholder="Language">
+      <input class="history-filter-input" id="rf-cognition" oninput="renderRegistryTable()" placeholder="Cognition">
     </div>
     <!-- Registry Table -->
-    <div style="flex:1;overflow:auto;">
+    <div style="flex:1;overflow:auto;padding:0 24px;">
       <div id="registryTable"></div>
     </div>
   </div>
 </div><!-- end page-registry -->
+
+<!-- ── Map View ───────────────────────────────────────────── -->
+<div class="page" id="page-map">
+  <div style="display:flex;height:100%;overflow:hidden;">
+    <!-- Map area -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;">
+      <div class="col-header" style="justify-content:space-between;">
+        <!-- Left: title -->
+        <span>Map View</span>
+        <!-- Right: toggles -->
+        <div style="display:flex;gap:20px;align-items:center;">
+          <label class="toggle-switch" id="mapFilterBtn">
+            <input type="checkbox" id="mapFilterCheck" onchange="toggleMapFilter()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Affected Only</span>
+          </label>
+          <label class="toggle-switch toggle-switch--blue" id="mapHelpersBtn" style="display:none;">
+            <input type="checkbox" id="mapHelpersCheck" onchange="toggleMapHelpers()">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Show Helpers</span>
+          </label>
+        </div>
+      </div>
+      <div id="mapContainer"></div>
+    </div>
+    <!-- Right detail panel -->
+    <div id="mapSidePanel" style="width:360px;min-width:260px;max-width:600px;border-left:1px solid #ddd;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;background:#fff;position:relative;">
+      <!-- Drag handle -->
+      <div id="mapPanelHandle" style="position:absolute;left:0;top:0;bottom:0;width:4px;cursor:col-resize;z-index:10;background:transparent;transition:background 0.15s;"
+           onmouseenter="this.style.background='rgba(204,0,0,0.25)'"
+           onmouseleave="this.style.background='transparent'"></div>
+      <div class="col-header" style="justify-content:space-between;">
+        <span id="mapPanelTitle">Affected Residents</span>
+        <button id="mapPanelBack" onclick="renderMapAffectedList()" style="display:none;background:none;border:none;cursor:pointer;color:#555;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:none;align-items:center;gap:4px;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+      </div>
+      <div id="mapSideContent" style="flex:1;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div><!-- end page-map -->
 
 <!-- Modal -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
@@ -570,27 +835,27 @@
       <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#555;">✕</button>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;">
-      <input id="m_name" placeholder="Full name *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
-      <input id="m_chineseName" placeholder="Chinese / local name" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <input id="m_name" placeholder="Full name *" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
+      <input id="m_chineseName" placeholder="Chinese / local name" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <input id="m_age" type="number" placeholder="Age *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
-        <input id="m_language" placeholder="Primary language *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+        <input id="m_age" type="number" placeholder="Age *" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
+        <input id="m_language" placeholder="Primary language *" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
       </div>
-      <select id="m_cognition" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+      <select id="m_cognition" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;background:#fff;">
         <option value="">Cognition level * (CDR)</option>
         <option value="No cognitive impairment (CDR 0)">No cognitive impairment (CDR 0)</option>
         <option value="Mild cognitive impairment (CDR 0.5–1)">Mild cognitive impairment (CDR 0.5–1)</option>
         <option value="Moderate dementia (CDR 2)">Moderate dementia (CDR 2)</option>
         <option value="Severe dementia (CDR 3)">Severe dementia (CDR 3)</option>
       </select>
-      <select id="m_mobility" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+      <select id="m_mobility" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;background:#fff;">
         <option value="">Mobility status * (EMS)</option>
         <option value="Fully bedridden — cannot move at all (EMS 0–4)">Fully bedridden (EMS 0–4)</option>
         <option value="Needs full assistance — wheelchair / supported (EMS 5–9)">Needs full assistance — wheelchair / supported (EMS 5–9)</option>
         <option value="Needs partial assistance — can walk with supervision (EMS 10–13)">Needs partial assistance — can walk with supervision (EMS 10–13)</option>
         <option value="Independent — can walk and move alone (EMS 14+)">Independent — can walk and move alone (EMS 14+)</option>
       </select>
-      <select id="m_sensory" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+      <select id="m_sensory" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;background:#fff;">
         <option value="">Sensory impairment * (WHO)</option>
         <option value="No sensory impairment">No sensory impairment</option>
         <option value="Mild hearing or vision loss — can manage without aids">Mild hearing / vision loss</option>
@@ -599,7 +864,7 @@
         <option value="Profound deafness or blindness — cannot receive audio or visual alerts">Profound deafness or blindness</option>
         <option value="Dual sensory impairment — both hearing and vision severely affected">Dual sensory impairment</option>
       </select>
-      <select id="m_psychological" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;background:#fff;">
+      <select id="m_psychological" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;background:#fff;">
         <option value="">Psychological status * (GDS)</option>
         <option value="No psychological concerns">No psychological concerns</option>
         <option value="Mild anxiety — tends to worry but can be reassured">Mild anxiety</option>
@@ -607,13 +872,16 @@
         <option value="PTSD — specific triggers cause strong reactions">PTSD</option>
         <option value="Severe anxiety or panic disorder — any sudden change triggers panic">Severe anxiety / panic disorder</option>
       </select>
-      <input id="m_location" placeholder="Home location *" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
-      <input id="m_strongTie" placeholder="Emergency contact (name & relationship)" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;box-sizing:border-box;">
+      <input id="m_location" placeholder="Home location *" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <input id="m_strongTie" placeholder="Emergency contact name *" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
+        <input id="m_phone" placeholder="Phone number" style="border:1px solid #bbb;padding:8px 10px;font-family:'Inter',sans-serif;font-size:11px;width:100%;box-sizing:border-box;">
+      </div>
       <textarea id="m_note" placeholder="Special note for responders" rows="3" style="border:1px solid #bbb;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;width:100%;resize:vertical;box-sizing:border-box;"></textarea>
       <div id="m_feedback" style="font-size:11px;color:#cc0000;display:none;">Please fill in all required fields.</div>
       <div style="display:flex;gap:12px;margin-top:8px;">
-        <button onclick="saveModal()" style="flex:1;background:#cc0000;color:#fff;border:none;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Save</button>
-        <button onclick="closeModal()" style="flex:1;background:#f5f5f5;color:#111;border:1px solid #ddd;padding:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Cancel</button>
+        <button onclick="saveModal()" class="btn btn-primary btn-full" style="flex:1;">Save</button>
+        <button onclick="closeModal()" class="btn btn-neutral btn-full" style="flex:1;">Cancel</button>
       </div>
     </div>
   </div>
@@ -628,7 +896,7 @@ let cachedAlerts = [];
 async function loadLiveAlert() {
   const btn = document.getElementById('loadAlertBtn');
   const status = document.getElementById('loadAlertStatus');
-  const select = document.getElementById('alertSelect');
+  const wrap = document.getElementById('alertDropdownWrap');
   btn.style.opacity = '0.5';
   btn.style.pointerEvents = 'none';
   status.textContent = 'Fetching...';
@@ -637,13 +905,16 @@ async function loadLiveAlert() {
     const data = await res.json();
     if (data && data.length > 0) {
       cachedAlerts = data;
-      select.innerHTML = '<option value="">— Select an alert —</option>' +
-        data.map((a, i) => {
-          const date = new Date(a.date_and_time).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-          const title = a.notification_title || a.notificationtype || 'NYC Alert';
-          return `<option value="${i}">${date} · ${title}</option>`;
-        }).join('');
-      select.style.display = 'block';
+      const list = document.getElementById('alertDropdownList');
+      list.innerHTML = data.map((a, i) => {
+        const date = new Date(a.date_and_time).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+        const title = a.notification_title || a.notificationtype || 'NYC Alert';
+        return `<div onclick="pickAlert(${i})" data-idx="${i}" style="display:flex;align-items:baseline;gap:10px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0;transition:background 0.1s;" onmouseenter="this.style.background='#f5f5f5'" onmouseleave="this.style.background=''">
+          <span style="font-size:10px;color:#999;white-space:nowrap;flex-shrink:0;">${date}</span>
+          <span style="font-size:11px;color:#111;line-height:1.4;">${title}</span>
+        </div>`;
+      }).join('');
+      wrap.style.display = 'block';
       status.textContent = '';
     } else {
       status.textContent = 'No alerts found.';
@@ -655,19 +926,55 @@ async function loadLiveAlert() {
   btn.style.pointerEvents = 'auto';
 }
 
-function selectAlert(sel) {
-  const idx = sel.value;
-  if (idx === '') return;
-  const alert = cachedAlerts[idx];
-  const text = alert.email_body || alert.notification_title || 'No content available';
-  document.getElementById('alertInput').value = text;
+function toggleAlertDropdown() {
+  const list = document.getElementById('alertDropdownList');
+  const chevron = document.getElementById('alertDropdownChevron');
+  const open = list.style.display === 'block';
+  list.style.display = open ? 'none' : 'block';
+  chevron.style.transform = open ? '' : 'rotate(180deg)';
 }
+
+function pickAlert(idx) {
+  const a = cachedAlerts[idx];
+  const text = a.email_body || a.notification_title || 'No content available';
+  document.getElementById('alertInput').value = text;
+  // Update label
+  const date = new Date(a.date_and_time).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  const title = a.notification_title || a.notificationtype || 'NYC Alert';
+  document.getElementById('alertDropdownLabel').textContent = `${date} · ${title}`;
+  document.getElementById('alertDropdownLabel').style.color = '#111';
+  // Close dropdown
+  document.getElementById('alertDropdownList').style.display = 'none';
+  document.getElementById('alertDropdownChevron').style.transform = '';
+  // Highlight selected row
+  document.querySelectorAll('#alertDropdownList [data-idx]').forEach(el => el.style.background = '');
+  const sel = document.querySelector(`#alertDropdownList [data-idx="${idx}"]`);
+  if (sel) sel.style.background = '#f0f0f0';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('alertDropdownWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('alertDropdownList').style.display = 'none';
+    document.getElementById('alertDropdownChevron').style.transform = '';
+  }
+});
 
 function switchTab(tab) {
   document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'history') renderHistory();
+  if (tab === 'map') {
+    setTimeout(() => {
+      initMap();
+      updateMapMarkers();
+      if (mapInstance) mapInstance.invalidateSize();
+      renderMapAffectedList();
+    }, 60);
+  }
 }
 
 let editingIdx = null;
@@ -676,26 +983,50 @@ function renderRegistryTable() {
   const table = document.getElementById('registryTable');
   const count = document.getElementById('registryCount');
   if (!table) return;
+
+  // Filter values
+  const fName     = (document.getElementById('rf-name')?.value     || '').toLowerCase();
+  const fLocation = (document.getElementById('rf-location')?.value || '').toLowerCase();
+  const fLanguage = (document.getElementById('rf-language')?.value || '').toLowerCase();
+  const fCognition= (document.getElementById('rf-cognition')?.value|| '').toLowerCase();
+
+  const filtered = personas.filter((p, i) => {
+    if (fName     && !p.name.toLowerCase().includes(fName))         return false;
+    if (fLocation && !(p.location||'').toLowerCase().includes(fLocation)) return false;
+    if (fLanguage && !(p.language||'').toLowerCase().includes(fLanguage)) return false;
+    if (fCognition&& !(p.cognition||'').toLowerCase().includes(fCognition))return false;
+    return true;
+  });
+
   if (count) count.textContent = personas.length;
-  const cols = '160px 50px 100px 160px 200px 160px 180px 180px 180px 60px';
+
+  const cols = '150px 44px 110px 160px 200px 150px 180px 170px 180px 44px';
   const headers = ['Name', 'Age', 'Language', 'Cognition', 'Mobility', 'Sensory', 'Psychological', 'Location', 'Emergency Contact', ''];
+
+  const cellStyle = 'padding:10px 12px;font-size:12px;color:#555;line-height:1.5;';
+  const headStyle = 'padding:9px 12px;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:#999;white-space:nowrap;';
+
   table.innerHTML = `
-    <div style="display:grid;grid-template-columns:${cols};background:#f5f5f5;border-bottom:2px solid #111;position:sticky;top:0;z-index:5;">
-      ${headers.map(h => `<div style="padding:10px 12px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#555;white-space:nowrap;">${h}</div>`).join('')}
+    <div style="display:grid;grid-template-columns:${cols};background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:5;min-width:100%;">
+      ${headers.map(h => `<div style="${headStyle}">${h}</div>`).join('')}
     </div>
-    ${personas.map((p, i) => `
-    <div style="display:grid;grid-template-columns:${cols};border-bottom:1px solid #f0f0f0;transition:background 0.15s;" onmouseenter="this.style.background='#fafafa'" onmouseleave="this.style.background=''">
-      <div style="padding:10px 12px;font-size:11px;font-weight:600;">${p.name}<br><span style="font-size:10px;color:#888;font-weight:400;">${p.chineseName}</span></div>
-      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.age}</div>
-      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.language}</div>
-      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.cognition || '—'}</div>
-      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.mobility}</div>
-      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.sensory || '—'}</div>
-      <div style="padding:10px 12px;font-size:10px;color:#555;">${p.psychological || '—'}</div>
-      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.location}</div>
-      <div style="padding:10px 12px;font-size:11px;color:#555;">${p.helpers ? p.helpers.strongTie : '—'}</div>
-      <div style="padding:10px 12px;"><button onclick="openModal(${i})" style="background:none;border:1px solid #ddd;padding:3px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;color:#555;text-transform:uppercase;letter-spacing:1px;">Edit</button></div>
-    </div>`).join('')}
+    ${filtered.length === 0 ? `<div style="padding:32px 12px;font-size:12px;color:#bbb;text-align:center;">No residents match your filters.</div>` :
+    filtered.map(p => {
+      const i = personas.indexOf(p);
+      return `
+      <div style="display:grid;grid-template-columns:${cols};border-bottom:1px solid #f0f0f0;transition:background 0.12s;" onmouseenter="this.style.background='#fafafa'" onmouseleave="this.style.background=''">
+        <div style="${cellStyle}color:#111;">${p.name}</div>
+        <div style="${cellStyle}">${p.age}</div>
+        <div style="${cellStyle}">${p.language}</div>
+        <div style="${cellStyle}">${p.cognition || '—'}</div>
+        <div style="${cellStyle}">${p.mobility}</div>
+        <div style="${cellStyle}">${p.sensory || '—'}</div>
+        <div style="${cellStyle}">${p.psychological || '—'}</div>
+        <div style="${cellStyle}">${p.location}</div>
+        <div style="${cellStyle}">${p.helpers ? p.helpers.strongTie : '—'}</div>
+        <div style="padding:10px 12px;display:flex;align-items:center;justify-content:center;"><button onclick="openModal(${i})" title="Edit" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:none;background:transparent;color:#999;cursor:pointer;transition:color 0.15s;" onmouseenter="this.style.color='#333'" onmouseleave="this.style.color='#999'"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></div>
+      </div>`;
+    }).join('')}
   `;
 }
 
@@ -726,6 +1057,7 @@ function openModal(idx) {
     }
     document.getElementById('m_location').value = p.location || '';
     document.getElementById('m_strongTie').value = p.helpers ? p.helpers.strongTie : '';
+    document.getElementById('m_phone').value = p.helpers ? (p.helpers.phone || '') : '';
     document.getElementById('m_note').value = p.note || '';
   } else {
     fields.forEach(id => { document.getElementById(id).value = ''; });
@@ -768,7 +1100,7 @@ function saveModal() {
     tags: [],
     warning: '',
     risk: '',
-    helpers: { strongTie: document.getElementById('m_strongTie').value.trim(), weakTie: '' }
+    helpers: { strongTie: document.getElementById('m_strongTie').value.trim(), phone: document.getElementById('m_phone').value.trim(), weakTie: '' }
   };
   if (editingIdx !== null) {
     personas[editingIdx] = newPersona;
@@ -788,26 +1120,26 @@ function saveModal() {
 function getApiKey() { return 'proxy'; }
 
 const personas = [
-  { name: 'Carmen', chineseName: 'Carmen Rivera', age: 78, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Mott Haven, Bronx, NY', note: 'Speaks very little English — all communication must be in Spanish. Responds well to familiar voices.', helpers: { strongTie: 'daughter Sofia Rivera (347-555-0192)', weakTie: '' } },
-  { name: 'Wei', chineseName: '黃偉明', age: 82, language: 'Cantonese', ttsLang: 'zh-HK', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Chinatown, Manhattan, NY', note: 'Only responds to Cantonese. Loud sounds trigger agitation. Familiar caregiver must be present.', helpers: { strongTie: 'son Danny Wong (212-555-0341)', weakTie: '' } },
-  { name: 'Irina', chineseName: 'Irina Volkov', age: 75, language: 'Russian', ttsLang: 'ru-RU', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Brighton Beach, Brooklyn, NY', note: 'Speaks limited English. Very independent but anxious about leaving her building alone during emergencies.', helpers: { strongTie: 'neighbor Olga Petrov on same floor (718-555-0287)', weakTie: '' } },
-  { name: 'Paige', chineseName: 'Paige Morrison', age: 91, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'St. George, Staten Island, NY', note: 'Fully bedridden and nearly deaf. Needs maximum speaker volume. Only responds to her named caregiver Mary.', helpers: { strongTie: 'caregiver Mary Donnelly (718-555-0156)', weakTie: '' } },
-  { name: 'Rosa', chineseName: 'Rosa Mendez', age: 84, language: 'Spanish', ttsLang: 'es-US', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Washington Heights, Manhattan, NY', note: 'Wanders if not supervised. Any urgency in tone causes panic. Must be spoken to very slowly in Spanish.', helpers: { strongTie: 'granddaughter Elena Mendez (646-555-0419)', weakTie: '' } },
-  { name: 'James', chineseName: 'James Washington', age: 79, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Bedford-Stuyvesant, Brooklyn, NY', note: 'Clinically depressed — may refuse to evacuate. Must be contacted by someone he personally trusts.', helpers: { strongTie: 'son Marcus Washington (718-555-0623)', weakTie: '' } },
-  { name: 'Lily', chineseName: '林玉蘭', age: 86, language: 'Mandarin (Traditional)', ttsLang: 'zh-TW', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Flushing, Queens, NY', note: 'Taiwanese background — uses Traditional Chinese. Gentle and cooperative but needs guidance in all directions.', helpers: { strongTie: 'daughter Jenny Lin (718-555-0772)', weakTie: '' } },
-  { name: 'Yusuf', chineseName: 'Yusuf Rahman', age: 73, language: 'Bengali', ttsLang: 'bn-BD', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Jackson Heights, Queens, NY', note: 'Speaks Bengali and limited English. Uses hearing aids. Cooperative and calm when spoken to clearly.', helpers: { strongTie: 'son Karim Rahman (718-555-0834)', weakTie: '' } },
-  { name: 'Grace', chineseName: 'Grace Belizaire', age: 88, language: 'Haitian Creole', ttsLang: 'fr-HT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flatbush, Brooklyn, NY', note: 'Haitian Creole is primary language. Wheelchair user — cannot self-evacuate. Reassured by prayer and familiar voices.', helpers: { strongTie: 'niece Marie Pierre (718-555-0945)', weakTie: '' } },
-  { name: 'Sun-Hee', chineseName: '박선희', age: 77, language: 'Korean', ttsLang: 'ko-KR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Flushing, Queens, NY', note: 'Severe hearing loss — speaker volume must be maximum. PTSD from past trauma; avoid alarming language.', helpers: { strongTie: 'daughter Jiyoung Park (718-555-1023)', weakTie: '' } },
-  { name: 'Antonio', chineseName: 'Antonio Guerrero', age: 80, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Soundview, Bronx, NY', note: 'Early memory loss — needs simple, repeated instructions. Wears hearing aids. Responds well to calm Spanish.', helpers: { strongTie: 'wife Carmen Guerrero at home (718-555-1134)', weakTie: '' } },
-  { name: 'Natasha', chineseName: 'Natasha Brodsky', age: 83, language: 'Russian', ttsLang: 'ru-RU', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Sheepshead Bay, Brooklyn, NY', note: 'Moderate dementia with severe anxiety. Each sentence must be independent. Never use urgent tone.', helpers: { strongTie: 'son Boris Brodsky (718-555-1267)', weakTie: '' } },
-  { name: 'Dorothy', chineseName: 'Dorothy Mae Johnson', age: 92, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'No psychological concerns', location: 'Harlem, Manhattan, NY', note: 'Fully bedridden and hard of hearing. Very calm if spoken to gently. Cannot call for help independently.', helpers: { strongTie: 'daughter Patricia Johnson (212-555-1389)', weakTie: '' } },
-  { name: 'Pham', chineseName: 'Phạm Văn Đức', age: 76, language: 'Vietnamese', ttsLang: 'vi-VN', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Sunset Park, Brooklyn, NY', note: 'Vietnamese speaker with PTSD. Avoid references to disaster, danger, or catastrophe. Needs calm reassurance.', helpers: { strongTie: 'son Minh Pham (718-555-1456)', weakTie: '' } },
-  { name: 'Maria', chineseName: 'María Flores', age: 85, language: 'Spanish', ttsLang: 'es-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Jackson Heights, Queens, NY', note: 'Severe dementia — no short-term memory. Each sentence must stand alone. Panics easily. Spanish only.', helpers: { strongTie: 'daughter Isabel Flores (718-555-1578)', weakTie: '' } },
-  { name: 'Enzo', chineseName: 'Enzo Caruso', age: 81, language: 'Italian', ttsLang: 'it-IT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Bensonhurst, Brooklyn, NY', note: 'Italian-speaking, mild memory issues. Wears hearing aids. Cooperative — responds well to direct simple instructions.', helpers: { strongTie: 'son Marco Caruso (718-555-1689)', weakTie: '' } },
-  { name: 'Aisha', chineseName: 'Aisha Diallo', age: 74, language: 'French', ttsLang: 'fr-FR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Harlem, Manhattan, NY', note: 'West African background, French-speaking. Clinically depressed — may withdraw during crisis. Needs warm, personal tone.', helpers: { strongTie: 'friend Aminata Bah (212-555-1723)', weakTie: '' } },
-  { name: 'Hyun', chineseName: '이현우', age: 89, language: 'Korean', ttsLang: 'ko-KR', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Bayside, Queens, NY', note: 'Moderate dementia and severe hearing loss — maximum speaker volume required. Wheelchair user. Korean only.', helpers: { strongTie: 'daughter Soyeon Lee (718-555-1845)', weakTie: '' } },
-  { name: 'Mei', chineseName: '张梅', age: 80, language: 'Mandarin (Simplified)', ttsLang: 'zh-CN', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flushing, Queens, NY', note: 'Mainland China background — Simplified Chinese. Early memory loss. Calm if given clear, simple instructions in Mandarin.', helpers: { strongTie: 'son Wei Zhang (718-555-1967)', weakTie: '' } },
-  { name: 'Ruth', chineseName: 'Ruth Ellen Cooper', age: 87, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'New Dorp, Staten Island, NY', note: 'Fully alert and communicative but wheelchair-bound. Needs caregiver to move her. Wears hearing aids.', helpers: { strongTie: 'daughter Carol Cooper (718-555-2089)', weakTie: '' } }
+  { name: 'Carmen', chineseName: 'Carmen Rivera', age: 78, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Mott Haven, Bronx, NY', note: 'Speaks very little English — all communication must be in Spanish. Responds well to familiar voices.', helpers: { strongTie: 'daughter Sofia Rivera', phone: '347-555-0192', weakTie: '' } },
+  { name: 'Wei', chineseName: '黃偉明', age: 82, language: 'Cantonese', ttsLang: 'zh-HK', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Chinatown, Manhattan, NY', note: 'Only responds to Cantonese. Loud sounds trigger agitation. Familiar caregiver must be present.', helpers: { strongTie: 'son Danny Wong', phone: '212-555-0341', weakTie: '' } },
+  { name: 'Irina', chineseName: 'Irina Volkov', age: 75, language: 'Russian', ttsLang: 'ru-RU', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Brighton Beach, Brooklyn, NY', note: 'Speaks limited English. Very independent but anxious about leaving her building alone during emergencies.', helpers: { strongTie: 'neighbor Olga Petrov', phone: '718-555-0287', weakTie: '' } },
+  { name: 'Paige', chineseName: 'Paige Morrison', age: 91, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'St. George, Staten Island, NY', note: 'Fully bedridden and nearly deaf. Needs maximum speaker volume. Only responds to her named caregiver Mary.', helpers: { strongTie: 'caregiver Mary Donnelly', phone: '718-555-0156', weakTie: '' } },
+  { name: 'Rosa', chineseName: 'Rosa Mendez', age: 84, language: 'Spanish', ttsLang: 'es-US', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Washington Heights, Manhattan, NY', note: 'Wanders if not supervised. Any urgency in tone causes panic. Must be spoken to very slowly in Spanish.', helpers: { strongTie: 'granddaughter Elena Mendez', phone: '646-555-0419', weakTie: '' } },
+  { name: 'James', chineseName: 'James Washington', age: 79, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Bedford-Stuyvesant, Brooklyn, NY', note: 'Clinically depressed — may refuse to evacuate. Must be contacted by someone he personally trusts.', helpers: { strongTie: 'son Marcus Washington', phone: '718-555-0623', weakTie: '' } },
+  { name: 'Lily', chineseName: '林玉蘭', age: 86, language: 'Mandarin (Traditional)', ttsLang: 'zh-TW', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Mild hearing or vision loss — can manage without aids', psychological: 'No psychological concerns', location: 'Flushing, Queens, NY', note: 'Taiwanese background — uses Traditional Chinese. Gentle and cooperative but needs guidance in all directions.', helpers: { strongTie: 'daughter Jenny Lin', phone: '718-555-0772', weakTie: '' } },
+  { name: 'Yusuf', chineseName: 'Yusuf Rahman', age: 73, language: 'Bengali', ttsLang: 'bn-BD', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Jackson Heights, Queens, NY', note: 'Speaks Bengali and limited English. Uses hearing aids. Cooperative and calm when spoken to clearly.', helpers: { strongTie: 'son Karim Rahman', phone: '718-555-0834', weakTie: '' } },
+  { name: 'Grace', chineseName: 'Grace Belizaire', age: 88, language: 'Haitian Creole', ttsLang: 'fr-HT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flatbush, Brooklyn, NY', note: 'Haitian Creole is primary language. Wheelchair user — cannot self-evacuate. Reassured by prayer and familiar voices.', helpers: { strongTie: 'niece Marie Pierre', phone: '718-555-0945', weakTie: '' } },
+  { name: 'Sun-Hee', chineseName: '박선희', age: 77, language: 'Korean', ttsLang: 'ko-KR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Flushing, Queens, NY', note: 'Severe hearing loss — speaker volume must be maximum. PTSD from past trauma; avoid alarming language.', helpers: { strongTie: 'daughter Jiyoung Park', phone: '718-555-1023', weakTie: '' } },
+  { name: 'Antonio', chineseName: 'Antonio Guerrero', age: 80, language: 'Spanish', ttsLang: 'es-US', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Soundview, Bronx, NY', note: 'Early memory loss — needs simple, repeated instructions. Wears hearing aids. Responds well to calm Spanish.', helpers: { strongTie: 'wife Carmen Guerrero', phone: '718-555-1134', weakTie: '' } },
+  { name: 'Natasha', chineseName: 'Natasha Brodsky', age: 83, language: 'Russian', ttsLang: 'ru-RU', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Sheepshead Bay, Brooklyn, NY', note: 'Moderate dementia with severe anxiety. Each sentence must be independent. Never use urgent tone.', helpers: { strongTie: 'son Boris Brodsky', phone: '718-555-1267', weakTie: '' } },
+  { name: 'Dorothy', chineseName: 'Dorothy Mae Johnson', age: 92, language: 'English', ttsLang: 'en-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Fully bedridden — cannot move at all (EMS 0–4)', sensory: 'Profound deafness or blindness — cannot receive audio or visual alerts', psychological: 'No psychological concerns', location: 'Harlem, Manhattan, NY', note: 'Fully bedridden and hard of hearing. Very calm if spoken to gently. Cannot call for help independently.', helpers: { strongTie: 'daughter Patricia Johnson', phone: '212-555-1389', weakTie: '' } },
+  { name: 'Pham', chineseName: 'Phạm Văn Đức', age: 76, language: 'Vietnamese', ttsLang: 'vi-VN', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'PTSD — specific triggers cause strong reactions', location: 'Sunset Park, Brooklyn, NY', note: 'Vietnamese speaker with PTSD. Avoid references to disaster, danger, or catastrophe. Needs calm reassurance.', helpers: { strongTie: 'son Minh Pham', phone: '718-555-1456', weakTie: '' } },
+  { name: 'Maria', chineseName: 'María Flores', age: 85, language: 'Spanish', ttsLang: 'es-US', cognition: 'Severe dementia (CDR 3)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Severe anxiety or panic disorder — any sudden change triggers panic', location: 'Jackson Heights, Queens, NY', note: 'Severe dementia — no short-term memory. Each sentence must stand alone. Panics easily. Spanish only.', helpers: { strongTie: 'daughter Isabel Flores', phone: '718-555-1578', weakTie: '' } },
+  { name: 'Enzo', chineseName: 'Enzo Caruso', age: 81, language: 'Italian', ttsLang: 'it-IT', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'Bensonhurst, Brooklyn, NY', note: 'Italian-speaking, mild memory issues. Wears hearing aids. Cooperative — responds well to direct simple instructions.', helpers: { strongTie: 'son Marco Caruso', phone: '718-555-1689', weakTie: '' } },
+  { name: 'Aisha', chineseName: 'Aisha Diallo', age: 74, language: 'French', ttsLang: 'fr-FR', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Independent — can walk and move alone (EMS 14+)', sensory: 'No sensory impairment', psychological: 'Depression — low motivation, may refuse help', location: 'Harlem, Manhattan, NY', note: 'West African background, French-speaking. Clinically depressed — may withdraw during crisis. Needs warm, personal tone.', helpers: { strongTie: 'friend Aminata Bah', phone: '212-555-1723', weakTie: '' } },
+  { name: 'Hyun', chineseName: '이현우', age: 89, language: 'Korean', ttsLang: 'ko-KR', cognition: 'Moderate dementia (CDR 2)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Severe hearing or vision loss — limited reception even with aids', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Bayside, Queens, NY', note: 'Moderate dementia and severe hearing loss — maximum speaker volume required. Wheelchair user. Korean only.', helpers: { strongTie: 'daughter Soyeon Lee', phone: '718-555-1845', weakTie: '' } },
+  { name: 'Mei', chineseName: '张梅', age: 80, language: 'Mandarin (Simplified)', ttsLang: 'zh-CN', cognition: 'Mild cognitive impairment (CDR 0.5–1)', mobility: 'Needs partial assistance — can walk with supervision (EMS 10–13)', sensory: 'No sensory impairment', psychological: 'Mild anxiety — tends to worry but can be reassured', location: 'Flushing, Queens, NY', note: 'Mainland China background — Simplified Chinese. Early memory loss. Calm if given clear, simple instructions in Mandarin.', helpers: { strongTie: 'son Wei Zhang', phone: '718-555-1967', weakTie: '' } },
+  { name: 'Ruth', chineseName: 'Ruth Ellen Cooper', age: 87, language: 'English', ttsLang: 'en-US', cognition: 'No cognitive impairment (CDR 0)', mobility: 'Needs full assistance — wheelchair / supported (EMS 5–9)', sensory: 'Moderate hearing or vision loss — requires hearing aid or glasses', psychological: 'No psychological concerns', location: 'New Dorp, Staten Island, NY', note: 'Fully alert and communicative but wheelchair-bound. Needs caregiver to move her. Wears hearing aids.', helpers: { strongTie: 'daughter Carol Cooper', phone: '718-555-2089', weakTie: '' } }
 ];
 
 const mockScript = "This person is safe. Please stay where you are. Someone you know is coming to help you right now.";
@@ -894,13 +1226,18 @@ function loadState() {
 
 function saveAlertToHistory(persona, alertText, script) {
   const history = JSON.parse(localStorage.getItem('guardian_history') || '[]');
+  // Extract a short disaster type from the first line / title words of alert
+  const firstLine = alertText.split('\n')[0].trim();
+  const disasterType = firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine;
   history.unshift({
     time: new Date().toLocaleString('en-US', { hour12: false }),
     persona: persona.name,
-    alertText: alertText.substring(0, 80) + (alertText.length > 80 ? '...' : ''),
+    location: persona.location || '',
+    disasterType: disasterType,
+    alertText: alertText.substring(0, 120) + (alertText.length > 120 ? '…' : ''),
     script: script
   });
-  if (history.length > 20) history.pop();
+  if (history.length > 50) history.pop();
   localStorage.setItem('guardian_history', JSON.stringify(history));
   renderHistory();
 }
@@ -908,13 +1245,39 @@ function saveAlertToHistory(persona, alertText, script) {
 function renderHistory() {
   const history = JSON.parse(localStorage.getItem('guardian_history') || '[]');
   const el = document.getElementById('historyList');
+  if (!el) return;
+
   if (history.length === 0) {
     el.innerHTML = '<span class="history-empty">No alerts issued yet. History persists across page refreshes.</span>';
     return;
   }
-  el.innerHTML = '<div class="history-list">' + history.map(h => `
+
+  const fName     = (document.getElementById('hf-name')?.value     || '').toLowerCase();
+  const fLocation = (document.getElementById('hf-location')?.value || '').toLowerCase();
+  const fDisaster = (document.getElementById('hf-disaster')?.value || '').toLowerCase();
+  const fTime     = (document.getElementById('hf-time')?.value     || '').toLowerCase();
+
+  const filtered = history.filter(h => {
+    if (fName     && !(h.persona      || '').toLowerCase().includes(fName))     return false;
+    if (fLocation && !(h.location     || '').toLowerCase().includes(fLocation)) return false;
+    if (fDisaster && !(h.disasterType || h.alertText || '').toLowerCase().includes(fDisaster)) return false;
+    if (fTime     && !(h.time         || '').toLowerCase().includes(fTime))     return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    el.innerHTML = '<span class="history-empty">No results match your filters.</span>';
+    return;
+  }
+
+  el.innerHTML = '<div class="history-list">' + filtered.map(h => `
     <div class="history-item">
-      <div class="history-meta">${h.time} · ${h.persona} · "${h.alertText}"</div>
+      <div class="history-meta">
+        <strong>${h.persona}</strong>
+        ${h.location ? ` · ${h.location}` : ''}
+        · ${h.time}
+      </div>
+      ${h.disasterType ? `<div class="history-disaster">${h.disasterType}</div>` : ''}
       <div class="history-script">${h.script}</div>
     </div>
   `).join('') + '</div>';
@@ -960,9 +1323,15 @@ function selectResident(idx) {
   }
   const indicator = document.getElementById('indicator-' + idx);
   if (indicator) indicator.style.background = '#cc0000';
-  // Show broadcast button if alert has been processed
+
+  // Update panel header
+  const header = document.getElementById('personPanelHeader');
+  if (header) header.textContent = 'Resident Detail';
+
+  // Show broadcast button, hide placeholder
   if (currentAlertText) {
     document.getElementById('broadcastBtnWrap').style.display = 'block';
+    document.getElementById('broadcastPlaceholder').style.display = 'none';
   }
 }
 
@@ -986,10 +1355,26 @@ function renderResidentList(affectedIndices) {
   const isFiltered = affectedIndices !== undefined;
   const affected = affectedIndices || personas.map((_, i) => i);
 
-  list.innerHTML = personas.map((p, i) => {
+  // When filtered: affected residents float to top, others follow
+  let displayOrder;
+  if (isFiltered) {
+    const nonAffected = personas.map((_, i) => i).filter(i => !affected.includes(i));
+    displayOrder = [...affected, ...nonAffected];
+  } else {
+    displayOrder = personas.map((_, i) => i);
+  }
+
+  // Find where non-affected starts (for separator)
+  const firstNonAffectedPos = isFiltered ? displayOrder.findIndex(i => !affected.includes(i)) : -1;
+
+  list.innerHTML = displayOrder.map((i, pi) => {
+    const p = personas[i];
     const isAffected = affected.includes(i);
     const dimmed = isFiltered && !isAffected;
-    return `
+    const separator = isFiltered && pi === firstNonAffectedPos
+      ? `<div style="padding:6px 16px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#ccc;border-bottom:1px solid #f0f0f0;background:#fafafa;">Other residents</div>`
+      : '';
+    return `${separator}
     <div class="resident-row" id="resident-row-${i}"
       style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:all 0.3s;opacity:${dimmed ? '0.3' : '1'};"
       onmouseenter="if(!${dimmed}) this.style.background='#f9f9f9'"
@@ -997,8 +1382,8 @@ function renderResidentList(affectedIndices) {
       onclick="if(!${dimmed}) selectResident(${i})">
       <div style="width:6px;height:6px;border-radius:50%;background:${isFiltered && isAffected ? '#cc0000' : 'transparent'};flex-shrink:0;"></div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-        <div style="font-size:10px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.location}</div>
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.chineseName}</div>
+        <div style="font-size:12px;color:#777777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.location}</div>
       </div>
       <div class="resident-indicator" id="indicator-${i}" style="width:3px;height:24px;background:transparent;flex-shrink:0;border-radius:2px;transition:background 0.15s;"></div>
     </div>`;
@@ -1029,12 +1414,28 @@ function makeColumnsResizable() {
 }
 
 function init() {
-  const grille = document.getElementById('grilleDots');
-  for (let i = 0; i < 70; i++) {
-    const d = document.createElement('div');
-    d.className = 'grille-dot';
-    grille.appendChild(d);
-  }
+  // Populate personaSelect
+  const select = document.getElementById('personaSelect');
+  personas.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = p.name;
+    select.appendChild(opt);
+  });
+
+  (function fillGrille() {
+    const grille = document.getElementById('grilleDots');
+    grille.innerHTML = '';
+    const containerWidth = grille.offsetWidth;
+    const dotMin = 8, gap = 3;
+    const cols = Math.floor((containerWidth + gap) / (dotMin + gap));
+    const total = cols * 3; // always 3 complete rows
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = 'grille-dot';
+      grille.appendChild(d);
+    }
+  })();
   loadState();
   loadCustomPersonas();
   updatePersona();
@@ -1088,22 +1489,24 @@ function updatePersona() {
   autoTags.push([p.language.toUpperCase() + ' SPEAKER', 'tag-gray']);
 
   document.getElementById('personaCard').innerHTML = `
-    <div class="persona-name">${p.name}</div>
-    <div class="persona-sub">${p.chineseName} · Age ${p.age} · ${p.language}</div>
+    <div class="persona-name">${p.chineseName}</div>
+    <div class="persona-sub">Age ${p.age} · ${p.language}</div>
     <div class="tags" style="margin-top:10px;">${autoTags.map(([t,c]) => `<span class="tag ${c}">${t}</span>`).join('')}</div>
     <div class="persona-note">
       <div style="display:flex;flex-direction:column;">
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.07-4.53A3 3 0 0 1 4.5 9.5a3 3 0 0 1 .5-1.66A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.07-4.53A3 3 0 0 0 19.5 9.5a3 3 0 0 0-.5-1.66A2.5 2.5 0 0 0 14.5 2Z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Cognition</span><span>${p.cognition || '—'}</span></div>
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Mobility</span><span>${p.mobility}</span></div>
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Sensory</span><span>${p.sensory || '—'}</span></div>
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Psychological</span><span>${p.psychological || '—'}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.07-4.53A3 3 0 0 1 4.5 9.5a3 3 0 0 1 .5-1.66A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.07-4.53A3 3 0 0 0 19.5 9.5a3 3 0 0 0-.5-1.66A2.5 2.5 0 0 0 14.5 2Z"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Cognition</span><span style="font-size:12px;">${p.cognition || '—'}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Mobility</span><span style="font-size:12px;">${p.mobility}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Sensory</span><span style="font-size:12px;">${p.sensory || '—'}</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Psychological</span><span style="font-size:12px;">${p.psychological || '—'}</span></div>
       </div>
       <div style="border-top:1px solid #eee;margin:12px 0;"></div>
-      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Location</span><span>${p.location}</span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Location</span><span style="font-size:12px;">${p.location}</span></div>
       <div style="border-top:1px solid #eee;margin:12px 0;"></div>
-      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.93 3.37 2 2 0 0 1 3.91 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Emergency Contact</span><span>${p.helpers ? p.helpers.strongTie : '—'}</span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Emergency Contact</span><span style="font-size:12px;">${p.helpers ? p.helpers.strongTie.split(' ').slice(1).join(' ') : '—'}</span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Relationship</span><span style="font-size:12px;">${p.helpers && p.helpers.strongTie ? p.helpers.strongTie.split(' ')[0].charAt(0).toUpperCase() + p.helpers.strongTie.split(' ')[0].slice(1) : '—'}</span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.93 3.37 2 2 0 0 1 3.91 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Phone</span><span style="font-size:12px;">${p.helpers && p.helpers.phone ? p.helpers.phone : '—'}</span></div>
       <div style="border-top:1px solid #eee;margin:12px 0;"></div>
-      <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;"><span style="flex-shrink:0;color:#111;padding-top:1px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span style="color:#111;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:130px;flex-shrink:0;white-space:nowrap;">Note</span><span>${p.note}</span></div>
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;"><span style="flex-shrink:0;color:#111;padding-top:2px;"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span><span style="color:#111;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;width:120px;flex-shrink:0;white-space:nowrap;font-weight:600;">Note</span><span style="font-size:12px;">${p.note}</span></div>
     </div>
   `;
   document.getElementById('personaMatch').textContent = p.name;
@@ -1131,6 +1534,32 @@ function addLog(msg, color) {
   line.style.color = color || '#888';
   line.textContent = '> ' + msg;
   log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function addContactNotifiedCard(persona) {
+  const log = document.getElementById('processingLog');
+  if (!log) return;
+  const contact = persona.helpers && persona.helpers.strongTie ? persona.helpers.strongTie : null;
+  const phone = persona.helpers && persona.helpers.phone ? persona.helpers.phone : null;
+  if (!contact) return;
+
+  // Parse relationship (first word) and name (rest)
+  const parts = contact.split(' ');
+  const rel = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+  const contactName = parts.slice(1).join(' ');
+
+  const card = document.createElement('div');
+  card.style.cssText = 'margin-top:12px;padding:10px 12px;border-left:3px solid #2E7D32;background:rgba(46,125,50,0.05);';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <span style="font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#2E7D32;">Emergency Contact Notified</span>
+    </div>
+    <div style="font-size:11px;color:#111;font-weight:600;line-height:1.6;">${contactName}</div>
+    <div style="font-size:10px;color:#555;line-height:1.6;">${rel}${phone ? ' · ' + phone : ''}</div>
+  `;
+  log.appendChild(card);
   log.scrollTop = log.scrollHeight;
 }
 
@@ -1203,9 +1632,27 @@ async function processAlert() {
   addLog('Matched ' + currentAffectedIndices.length + ' resident' + (currentAffectedIndices.length !== 1 ? 's' : '') + ' in registry.', '#111');
 
   const statusEl = document.getElementById('registryStatus');
-  if (statusEl) statusEl.textContent = currentAffectedIndices.length + ' residents in affected area';
+  if (statusEl) {
+    statusEl.textContent = currentAffectedIndices.length;
+    statusEl.style.display = currentAffectedIndices.length > 0 ? 'inline' : 'none';
+  }
 
   renderResidentList(currentAffectedIndices);
+  simulateHelperGPS();
+  // GPS is now live — reveal and auto-enable helper toggle
+  const helpersBtn = document.getElementById('mapHelpersBtn');
+  if (helpersBtn) helpersBtn.style.display = '';
+  mapShowHelpers = true;
+  const helpersCheck = document.getElementById('mapHelpersCheck');
+  if (helpersCheck) helpersCheck.checked = true;
+  if (mapInstance) {
+    helperMapMarkers.forEach(({ marker }) => marker.setStyle(helperMarkerStyle(true)));
+    updateMapMarkers();
+    renderMapAffectedList();
+  }
+  // Badge is a DOM element — update regardless of map init state
+  const _badge = document.getElementById('mapTabBadge');
+  if (_badge) _badge.style.display = currentAffectedIndices.length > 0 ? 'block' : 'none';
 
   addLog('Select a resident to generate their personalized broadcast.', '#888');
 
@@ -1267,7 +1714,14 @@ async function broadcastToResident() {
   document.getElementById('broadcastStatus').className = 'active-val';
   document.getElementById('lastPush').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
 
-  await sleep(3000);
+  await sleep(1200);
+  addLog('Notifying emergency contact...', '#888');
+  await sleep(1000);
+  addContactNotifiedCard(persona);
+  notifiedContacts[currentPersonaIdx] = true;
+  updateResidentPulse(currentPersonaIdx);
+
+  await sleep(800);
   document.getElementById('broadcastStatus').textContent = 'Complete';
   document.getElementById('broadcastStatus').className = '';
   dot.classList.remove('alert');
@@ -1347,7 +1801,7 @@ Elder profile:
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4o-mini',
         max_tokens: 600,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1379,7 +1833,7 @@ function blobToBase64(blob) {
   });
 }
 
-const PI_URL = 'http://192.168.1.124:5001'; // change to Pi IP when ready
+const PI_URL = 'http://172.20.10.6:5001'; // Pi on iPhone hotspot
 
 async function generateAudio(text) {
   try {
@@ -1416,9 +1870,503 @@ async function generateAudio(text) {
 
 init();
 </script>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── Map data ─────────────────────────────────────────────────
+const neighborhoodCoords = {
+  'Mott Haven, Bronx, NY':              [40.8087, -73.9282],
+  'Chinatown, Manhattan, NY':           [40.7158, -73.9970],
+  'Brighton Beach, Brooklyn, NY':       [40.5776, -73.9613],
+  'St. George, Staten Island, NY':      [40.6437, -74.0736],
+  'Washington Heights, Manhattan, NY':  [40.8448, -73.9396],
+  'Bedford-Stuyvesant, Brooklyn, NY':   [40.6872, -73.9418],
+  'Flushing, Queens, NY':               [40.7675, -73.8330],
+  'Jackson Heights, Queens, NY':        [40.7557, -73.8830],
+  'Flatbush, Brooklyn, NY':             [40.6501, -73.9496],
+  'Soundview, Bronx, NY':               [40.8196, -73.8697],
+  'Sheepshead Bay, Brooklyn, NY':       [40.5921, -73.9418],
+  'Harlem, Manhattan, NY':              [40.8116, -73.9465],
+  'Sunset Park, Brooklyn, NY':          [40.6501, -74.0047],
+  'Bensonhurst, Brooklyn, NY':          [40.6022, -74.0059],
+  'Bayside, Queens, NY':                [40.7638, -73.7663],
+  'New Dorp, Staten Island, NY':        [40.5736, -74.1196],
+};
+
+const mockHelpers = [
+  { id: 0,  name: 'Carlos Rivera',    role: 'Community Volunteer',   neighborhood: 'Mott Haven, Bronx',         coords: [40.8050, -73.9250], phone: '718-555-3010', languages: ['English', 'Spanish'] },
+  { id: 1,  name: 'Patricia Wu',      role: 'Red Cross Volunteer',   neighborhood: 'Chinatown, Manhattan',      coords: [40.7180, -73.9990], phone: '212-555-3007', languages: ['English', 'Cantonese', 'Mandarin'] },
+  { id: 2,  name: 'Olga Petrov',      role: 'Community Neighbor',    neighborhood: 'Brighton Beach, Brooklyn',  coords: [40.5800, -73.9580], phone: '718-555-3005', languages: ['English', 'Russian'] },
+  { id: 3,  name: 'Ana López',        role: 'Community Volunteer',   neighborhood: 'Soundview, Bronx',          coords: [40.8250, -73.8720], phone: '718-555-3004', languages: ['English', 'Spanish'] },
+  { id: 4,  name: 'Robert Thompson',  role: 'Fire Dept. Reserve',    neighborhood: 'Bed-Stuy, Brooklyn',        coords: [40.6900, -73.9400], phone: '718-555-3008', languages: ['English'] },
+  { id: 5,  name: 'David Chen',       role: 'Community Volunteer',   neighborhood: 'Flushing, Queens',          coords: [40.7720, -73.8290], phone: '718-555-3001', languages: ['English', 'Mandarin'] },
+  { id: 6,  name: 'Maria Santos',     role: 'Red Cross Volunteer',   neighborhood: 'Jackson Heights, Queens',   coords: [40.7520, -73.8870], phone: '718-555-3002', languages: ['English', 'Spanish'] },
+  { id: 7,  name: 'Ahmed Hassan',     role: 'Community Volunteer',   neighborhood: 'Jackson Heights, Queens',   coords: [40.7600, -73.8800], phone: '718-555-3006', languages: ['English', 'Arabic', 'Bengali'] },
+  { id: 8,  name: 'Yuki Tanaka',      role: 'Social Worker',         neighborhood: 'Sunset Park, Brooklyn',    coords: [40.6480, -74.0020], phone: '718-555-3009', languages: ['English', 'Spanish'] },
+  { id: 9,  name: 'Linda Freeman',    role: 'Registered Nurse',      neighborhood: 'Harlem, Manhattan',         coords: [40.8150, -73.9490], phone: '212-555-3011', languages: ['English', 'French'] },
+  { id: 10, name: 'Mikhail Volkov',   role: 'Community Volunteer',   neighborhood: 'Sheepshead Bay, Brooklyn',  coords: [40.5950, -73.9400], phone: '718-555-3012', languages: ['English', 'Russian'] },
+  { id: 11, name: 'James Kim',        role: 'Social Worker',         neighborhood: 'Bayside, Queens',           coords: [40.7580, -73.7700], phone: '718-555-3003', languages: ['English', 'Korean'] },
+];
+
+// ── Map state ─────────────────────────────────────────────────
+let mapInstance = null;
+let mapMarkers = [];        // [{ marker, idx }]
+let helperMapMarkers = [];  // [{ marker, helper }]
+let mapShowHelpers = false;
+let mapShowAffectedOnly = false;
+let selectedMapResident = null;
+const notifiedHelpers = {};
+const notifiedContacts = {};
+const pulseRings = {};
+let liveHelpers = [];       // helpers with simulated GPS coords, set at processAlert time
+let liveGpsTime = null;     // timestamp of last GPS simulation
+
+// ── GPS simulation ─────────────────────────────────────────────
+// Called at processAlert time. Jitters each helper's position
+// by ±400 m to simulate they're moving around the city.
+function simulateHelperGPS() {
+  const jitter = 0.004; // ~440 m at NYC latitude
+  liveHelpers = mockHelpers.map(h => ({
+    ...h,
+    liveCoords: [
+      h.coords[0] + (Math.random() - 0.5) * jitter * 2,
+      h.coords[1] + (Math.random() - 0.5) * jitter * 2
+    ]
+  }));
+  liveGpsTime = new Date();
+
+  // Move helper map markers to live positions
+  helperMapMarkers.forEach(({ marker, helper }) => {
+    const live = liveHelpers.find(h => h.id === helper.id);
+    if (live) marker.setLatLng(live.liveCoords);
+  });
+}
+
+function getResidentCoords(p) {
+  return neighborhoodCoords[p.location] || null;
+}
+
+function distanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function getNearbyHelpers(idx, maxKm = 5) {
+  const p = personas[idx];
+  const rc = getResidentCoords(p);
+  if (!rc) return [];
+  // Use live GPS coords if available, else base coords
+  const source = liveHelpers.length > 0 ? liveHelpers : mockHelpers;
+  return source
+    .map(h => {
+      const c = h.liveCoords || h.coords;
+      return { ...h, dist: distanceKm(rc[0], rc[1], c[0], c[1]) };
+    })
+    .filter(h => h.dist <= maxKm)
+    .sort((a, b) => a.dist - b.dist);
+}
+
+// ── Map init & markers ─────────────────────────────────────────
+function initMap() {
+  if (mapInstance) return;
+
+  mapInstance = L.map('mapContainer', { center: [40.710, -73.970], zoom: 11 });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(mapInstance);
+
+  // Resident markers
+  personas.forEach((p, i) => {
+    const coords = getResidentCoords(p);
+    if (!coords) return;
+    const isAffected = currentAffectedIndices.includes(i);
+    const marker = L.circleMarker(coords, residentMarkerStyle(isAffected, false)).addTo(mapInstance);
+    marker.bindTooltip(p.chineseName, { className: 'map-tooltip', direction: 'top', offset: [0, -6] });
+    marker.on('click', () => selectMapResident(i));
+    mapMarkers.push({ marker, idx: i });
+  });
+
+  // Helper markers — visible by default (mapShowHelpers = true)
+  mockHelpers.forEach(h => {
+    const marker = L.circleMarker(h.coords, helperMarkerStyle(mapShowHelpers)).addTo(mapInstance);
+    marker.bindTooltip(`${h.name} · ${h.role}`, { className: 'map-tooltip', direction: 'top', offset: [0, -6] });
+    helperMapMarkers.push({ marker, helper: h });
+  });
+
+  // Restore pulse rings for any residents already notified before map was opened
+  personas.forEach((_, i) => updateResidentPulse(i));
+}
+
+function residentMarkerStyle(isAffected, isSelected) {
+  return {
+    radius: isSelected ? 13 : 9,
+    fillColor: isAffected ? '#cc0000' : '#888888',
+    color:     isAffected ? '#B71C1C' : '#555555',
+    weight: isSelected ? 3 : 1.5,
+    opacity: 1,
+    fillOpacity: isAffected ? 0.9 : 0.45
+  };
+}
+
+function helperMarkerStyle(visible) {
+  return {
+    radius: 6,
+    fillColor: '#1565C0',
+    color: '#0D47A1',
+    weight: 1.5,
+    opacity: visible ? 1 : 0,
+    fillOpacity: visible ? 0.75 : 0
+  };
+}
+
+function updateMapMarkers() {
+  mapMarkers.forEach(({ marker, idx }) => {
+    const isAffected = currentAffectedIndices.includes(idx);
+    const hide = mapShowAffectedOnly && !isAffected;
+    const isSelected = idx === selectedMapResident;
+    marker.setStyle({
+      ...residentMarkerStyle(isAffected, isSelected),
+      opacity: hide ? 0 : 1,
+      fillOpacity: hide ? 0 : (isAffected ? 0.9 : 0.45)
+    });
+  });
+  const badge = document.getElementById('mapTabBadge');
+  if (badge) badge.style.display = currentAffectedIndices.length > 0 ? 'block' : 'none';
+}
+
+function toggleMapFilter() {
+  mapShowAffectedOnly = document.getElementById('mapFilterCheck').checked;
+  updateMapMarkers();
+}
+
+function toggleMapHelpers() {
+  mapShowHelpers = document.getElementById('mapHelpersCheck').checked;
+  helperMapMarkers.forEach(({ marker }) => marker.setStyle(helperMarkerStyle(mapShowHelpers)));
+}
+
+function renderMapAffectedList() {
+  selectedMapResident = null;
+  // Reset all marker selections
+  mapMarkers.forEach(({ marker, idx }) => {
+    marker.setStyle(residentMarkerStyle(currentAffectedIndices.includes(idx), false));
+  });
+  // Update header
+  const title = document.getElementById('mapPanelTitle');
+  const back = document.getElementById('mapPanelBack');
+  if (title) title.textContent = currentAffectedIndices.length > 0
+    ? currentAffectedIndices.length + ' Affected Residents'
+    : 'Affected Residents';
+  if (back) back.style.display = 'none';
+
+  const el = document.getElementById('mapSideContent');
+  if (!el) return;
+
+  const hasAlert = currentAffectedIndices.length > 0;
+  const displayList = hasAlert ? currentAffectedIndices : personas.map((_, i) => i);
+
+  // Update title
+  if (title) title.textContent = hasAlert
+    ? currentAffectedIndices.length + ' Affected Residents'
+    : 'All Residents';
+
+  el.innerHTML = displayList.map(idx => {
+    const p = personas[idx];
+    const isAffected = currentAffectedIndices.includes(idx);
+    const tags = [];
+    if (p.mobility && !p.mobility.startsWith('Independent'))
+      tags.push(`<span class="tag tag-red" style="font-size:9px;padding:2px 6px;">${p.mobility.split('—')[0].trim()}</span>`);
+    if (p.psychological && !p.psychological.startsWith('No psychological'))
+      tags.push(`<span class="tag tag-red" style="font-size:9px;padding:2px 6px;">${p.psychological.split('—')[0].trim()}</span>`);
+    const nearby = getNearbyHelpers(idx, 5);
+    const notifiedHelperCount = nearby.filter(h => !!notifiedHelpers[`${h.id}_${idx}`]).length;
+    const contactDone = !!notifiedContacts[idx];
+    const totalNotified = notifiedHelperCount + (contactDone ? 1 : 0);
+    const totalPossible = nearby.length + 1;
+    const notifBadge = hasAlert && totalNotified > 0
+      ? `<span style="font-size:10px;font-weight:600;color:#2E7D32;white-space:nowrap;">${totalNotified}/${totalPossible} notified</span>`
+      : '';
+    const dot = hasAlert
+      ? `<span style="width:8px;height:8px;border-radius:50%;background:#CC0000;flex-shrink:0;"></span>`
+      : `<span style="width:8px;height:8px;flex-shrink:0;"></span>`;
+    return `
+      <div onclick="selectMapResident(${idx})"
+           style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.12s;"
+           onmouseenter="this.style.background='#fafafa'" onmouseleave="this.style.background=''">
+        ${dot}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;color:#111;">${p.chineseName}</div>
+          <div style="font-size:11px;color:#777;margin-top:1px;">${p.location}</div>
+          ${tags.length ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;">${tags.join('')}</div>` : ''}
+        </div>
+        ${notifBadge}
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+  }).join('');
+}
+
+function selectMapResident(idx) {
+  selectedMapResident = idx;
+  mapMarkers.forEach(({ marker, idx: i }) => {
+    marker.setStyle(residentMarkerStyle(currentAffectedIndices.includes(i), i === idx));
+  });
+  // Update header to show back button
+  const title = document.getElementById('mapPanelTitle');
+  const back = document.getElementById('mapPanelBack');
+  if (title) title.textContent = 'Resident Detail';
+  if (back) back.style.display = 'flex';
+  renderMapSidePanel(idx);
+  const coords = getResidentCoords(personas[idx]);
+  if (coords && mapInstance) mapInstance.panTo(coords, { animate: true });
+}
+
+// ── Side panel render (design-system aligned) ──────────────────
+const ICONS = {
+  age:       `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
+  language:  `<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>`,
+  cognition: `<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.07-4.53A3 3 0 0 1 4.5 9.5a3 3 0 0 1 .5-1.66A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.07-4.53A3 3 0 0 0 19.5 9.5a3 3 0 0 0-.5-1.66A2.5 2.5 0 0 0 14.5 2Z"/>`,
+  mobility:  `<circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/>`,
+  sensory:   `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>`,
+  psych:     `<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`,
+  location:  `<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>`,
+  contact:   `<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
+  phone:     `<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12 19.79 19.79 0 0 1 1.93 3.37 2 2 0 0 1 3.91 1.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>`,
+  note:      `<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>`,
+  helper:    `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 1-2-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
+  dist:      `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
+  bell:      `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`,
+  check:     `<polyline points="20 6 9 17 4 12"/>`,
+};
+
+function iconRow(key, label, value, valueColor) {
+  const col = valueColor || '#111111';
+  return `<div style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;">
+    <span style="flex-shrink:0;color:#9E9E9E;margin-top:1px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]}</svg>
+    </span>
+    <span style="color:#555555;font-size:10px;text-transform:uppercase;letter-spacing:1px;width:116px;flex-shrink:0;font-weight:600;line-height:1.6;">${label}</span>
+    <span style="font-size:11px;color:${col};line-height:1.6;flex:1;">${value}</span>
+  </div>`;
+}
+
+function bellBtn(solid, notified, onclick, title, label) {
+  const cls = solid ? 'btn-icon btn-icon-solid' : 'btn-icon btn-icon-outline';
+  const icon = notified ? ICONS.check : ICONS.bell;
+  const widthStyle = label ? 'width:auto;padding:0 12px;gap:6px;' : '';
+  const labelHtml = label
+    ? `<span style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">${label}</span>`
+    : '';
+  return `<button class="${cls}${notified ? ' is-notified' : ''}"
+    onclick="${onclick}" ${notified ? 'disabled' : ''} title="${title}"
+    style="margin-top:0;${widthStyle}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>
+    ${labelHtml}
+  </button>`;
+}
+
+function renderMapSidePanel(idx) {
+  const p = personas[idx];
+  const isAffected = currentAffectedIndices.includes(idx);
+  const nearby = getNearbyHelpers(idx, 5);
+  const hasLiveGps = liveHelpers.length > 0;
+  const contactNotified = !!notifiedContacts[idx];
+
+  // Tags
+  const tags = [];
+  if (p.mobility && !p.mobility.startsWith('Independent'))
+    tags.push(`<span class="tag tag-red">${p.mobility.split('—')[0].trim()}</span>`);
+  if (p.sensory && !p.sensory.startsWith('No sensory'))
+    tags.push(`<span class="tag tag-red">${p.sensory.split('—')[0].trim()}</span>`);
+  if (p.psychological && !p.psychological.startsWith('No psychological'))
+    tags.push(`<span class="tag tag-red">${p.psychological.split('—')[0].trim()}</span>`);
+  tags.push(`<span class="tag tag-gray">${p.language} Speaker</span>`);
+
+  // Helper rows
+  const allNotified = nearby.length > 0 && nearby.every(h => !!notifiedHelpers[`${h.id}_${idx}`]);
+
+  const helperRows = nearby.length === 0
+    ? `<p class="mp-meta" style="padding:8px 0;">No registered helpers within 5 km.</p>`
+    : nearby.map(h => {
+        const key = `${h.id}_${idx}`;
+        const done = !!notifiedHelpers[key];
+        return `
+        <div class="helper-card ${done ? 'is-notified' : ''}">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="flex-shrink:0;color:#9E9E9E;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS.helper}</svg>
+            </span>
+            <div style="flex:1;min-width:0;">
+              <div class="mp-name">${h.name}</div>
+              <div class="helper-dist" style="margin-top:2px;">${h.dist.toFixed(1)} km</div>
+              <div class="mp-role" style="margin-top:4px;">${h.role}</div>
+              <div class="mp-meta" style="margin-top:4px;">${h.phone}</div>
+            </div>
+            <div style="flex-shrink:0;">
+              ${bellBtn(false, done, `notifyHelper(${h.id},${idx})`, done ? 'Notified' : 'Notify')}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+
+  // Emergency contact card
+  const contactRaw = p.helpers && p.helpers.strongTie ? p.helpers.strongTie : '';
+  const contactPhone = p.helpers && p.helpers.phone ? p.helpers.phone : '—';
+  const contactParts = contactRaw.split(' ');
+  const contactRel = contactParts[0] ? contactParts[0].charAt(0).toUpperCase() + contactParts[0].slice(1) : '';
+  const contactName = contactParts.slice(1).join(' ') || contactRaw;
+  const contactCard = `
+    <div class="helper-card ${contactNotified ? 'is-notified' : ''}">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="flex-shrink:0;color:#9E9E9E;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS.contact}</svg>
+        </span>
+        <div style="flex:1;min-width:0;">
+          <div class="mp-name">${contactName}</div>
+          <div class="mp-role" style="margin-top:2px;">${contactRel}</div>
+          <div class="mp-meta" style="margin-top:5px;">${contactPhone}</div>
+        </div>
+        ${currentAlertText ? `<div style="flex-shrink:0;">${bellBtn(false, contactNotified, `notifyContact(${idx})`, contactNotified ? 'Notified' : 'Notify')}</div>` : ''}
+      </div>
+    </div>`;
+
+  const gpsLine = hasLiveGps
+    ? `<div style="display:flex;align-items:center;gap:5px;margin-top:4px;">
+         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1565C0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+         <span style="font-size:10px;color:#1565C0;letter-spacing:0.5px;">Live GPS · ${liveGpsTime.getHours().toString().padStart(2,'0')}:${liveGpsTime.getMinutes().toString().padStart(2,'0')}</span>
+       </div>`
+    : '';
+
+  document.getElementById('mapSideContent').innerHTML = `
+    <div style="padding:20px 24px;">
+
+      <!-- Name + tags -->
+      <div class="mp-title" style="display:flex;align-items:center;gap:9px;">
+        ${isAffected ? `<span style="width:8px;height:8px;border-radius:50%;background:#CC0000;flex-shrink:0;display:inline-block;margin-top:2px;"></span>` : ''}
+        ${p.chineseName}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;">${tags.join('')}</div>
+
+      <div class="mp-divider"></div>
+
+      <!-- Nearby helpers — only shown during active alert (GPS is simulated at processAlert time) -->
+      ${currentAlertText ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;flex-direction:column;">
+          <span class="mp-label">Nearby Helpers</span>
+          ${gpsLine}
+        </div>
+        ${nearby.length > 0 ? bellBtn(true, allNotified, `notifyAllHelpers(${idx})`, allNotified ? 'All Notified' : 'Notify All', allNotified ? 'All Notified' : 'Notify All') : ''}
+      </div>
+      ${helperRows}
+      <div class="mp-divider"></div>
+      ` : ''}
+
+      <!-- Emergency contact -->
+      <div style="margin-bottom:12px;"><span class="mp-label">Emergency Contact</span></div>
+      ${contactCard}
+
+      <div class="mp-divider"></div>
+
+      <!-- Profile rows -->
+      ${iconRow('age',       'Age',        p.age + ' years old')}
+      ${iconRow('language',  'Language',   p.language)}
+      ${iconRow('cognition', 'Cognition',  p.cognition || '—')}
+      ${iconRow('mobility',  'Mobility',   p.mobility || '—')}
+      ${iconRow('sensory',   'Sensory',    p.sensory || '—')}
+      ${iconRow('psych',     'Psychology', p.psychological || '—')}
+
+      <div class="mp-divider"></div>
+
+      <!-- Location + note -->
+      ${iconRow('location', 'Location', p.location)}
+      ${iconRow('note',     'Note',     p.note)}
+
+    </div>
+  `;
+}
+
+function notifyHelper(helperId, residentIdx) {
+  notifiedHelpers[`${helperId}_${residentIdx}`] = true;
+  updateResidentPulse(residentIdx);
+  renderMapSidePanel(residentIdx);
+}
+
+function notifyAllHelpers(residentIdx) {
+  const nearby = getNearbyHelpers(residentIdx, 5);
+  nearby.forEach(h => { notifiedHelpers[`${h.id}_${residentIdx}`] = true; });
+  notifiedContacts[residentIdx] = true;
+  updateResidentPulse(residentIdx);
+  renderMapSidePanel(residentIdx);
+}
+
+function notifyContact(residentIdx) {
+  notifiedContacts[residentIdx] = true;
+  updateResidentPulse(residentIdx);
+  renderMapSidePanel(residentIdx);
+}
+
+function updateResidentPulse(residentIdx) {
+  if (!mapInstance) return;
+  const p = personas[residentIdx];
+  const coords = getResidentCoords(p);
+  if (!coords) return;
+  const nearby = getNearbyHelpers(residentIdx, 5);
+  const hasNotified = nearby.some(h => !!notifiedHelpers[`${h.id}_${residentIdx}`])
+                   || !!notifiedContacts[residentIdx];
+  if (!hasNotified || pulseRings[residentIdx]) return;
+
+  const pulseIcon = L.divIcon({
+    className: 'pulse-marker-icon',
+    html: '<div class="pulse-ring"></div>',
+    iconSize: [60, 60],
+    iconAnchor: [30, 30]
+  });
+  const ring = L.marker(coords, { icon: pulseIcon, interactive: false, zIndexOffset: -200 }).addTo(mapInstance);
+  pulseRings[residentIdx] = ring;
+}
+
+// ── Resize handle ──────────────────────────────────────────────
+(function() {
+  const handle = document.getElementById('mapPanelHandle');
+  const panel  = document.getElementById('mapSidePanel');
+  if (!handle || !panel) return;
+
+  let dragging = false, startX = 0, startW = 0;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX;
+    startW = panel.offsetWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const delta = startX - e.clientX; // dragging left edge → moving left = wider
+    const newW = Math.min(600, Math.max(260, startW + delta));
+    panel.style.width = newW + 'px';
+    if (mapInstance) mapInstance.invalidateSize();
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    handle.style.background = 'transparent';
+  });
+})();
+</script>
 </body>
 </html>
-
 
 
 
