@@ -1331,7 +1331,6 @@ function selectResident(idx) {
   // Show broadcast button, hide placeholder
   if (currentAlertText) {
     document.getElementById('broadcastBtnWrap').style.display = 'block';
-    document.getElementById('broadcastPlaceholder').style.display = 'none';
   }
 }
 
@@ -1833,7 +1832,7 @@ function blobToBase64(blob) {
   });
 }
 
-const PI_URL = 'https://promoter-faculty-radial.ngrok-free.dev';
+const PI_URL = 'http://172.20.10.6:5001'; // Pi on iPhone hotspot
 
 async function generateAudio(text) {
   try {
@@ -1858,13 +1857,10 @@ async function generateAudio(text) {
     // Pi broadcast
     const base64 = await blobToBase64(blob);
     await fetch(`${PI_URL}/play`, {
-    method: 'POST',
-    headers: { 
-     'Content-Type': 'application/json',
-     'ngrok-skip-browser-warning': '1'
-    },
-    body: JSON.stringify({ audio: base64 })
-}).catch(() => {});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audio: base64 })
+    }).catch(() => {});
 
   } catch (e) {
     speakText(text);
@@ -2368,6 +2364,8 @@ function updateResidentPulse(residentIdx) {
   });
 })();
 </script>
+</body>
+</html>
 </body>
 </html>
 
